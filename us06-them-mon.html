@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm món</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        label { display: block; margin-top: 10px; }
+        input, select { width: 300px; padding: 8px; margin-top: 5px; }
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>US06 – Thêm món</h2>
+
+    <label>Tên món</label>
+    <input id="tenMon" type="text" placeholder="Ví dụ: Trà đào">
+
+    <label>Giá món (VND)</label>
+    <input id="giaMon" type="number" placeholder="30000">
+
+    <label>Loại món</label>
+    <select id="loaiMon">
+        <option value="Đồ uống">Đồ uống</option>
+        <option value="Món ăn">Món ăn</option>
+        <option value="Khác">Khác</option>
+    </select>
+
+    <button onclick="themMon()">Thêm món</button>
+
+    <p id="thongBao" style="color: green; margin-top: 20px;"></p>
+
+    <script>
+        function themMon() {
+            let ten = document.getElementById("tenMon").value.trim();
+            let gia = document.getElementById("giaMon").value.trim();
+            let loai = document.getElementById("loaiMon").value;
+
+            if (!ten || !gia) {
+                alert("Vui lòng nhập đầy đủ thông tin!");
+                return;
+            }
+
+            let monMoi = { ten, gia, loai };
+
+            let dsMon = JSON.parse(localStorage.getItem("dsMon")) || [];
+
+            dsMon.push(monMoi);
+
+            localStorage.setItem("dsMon", JSON.stringify(dsMon));
+
+            document.getElementById("thongBao").innerText = "Thêm món thành công!";
+            document.getElementById("tenMon").value = "";
+            document.getElementById("giaMon").value = "";
+        }
+    </script>
+
+</body>
+</html>
