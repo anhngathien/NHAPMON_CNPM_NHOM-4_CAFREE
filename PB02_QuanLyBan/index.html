@@ -2,23 +2,104 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản lý bàn - Café</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Xem danh sách món</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+        h1 { text-align: center; }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #aaa;
+        }
+
+        .menu-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .name { font-weight: bold; }
+        .price { color: green; }
+        .type { color: #555; }
+
+        .add-btn {
+            width: 100%;
+            padding: 10px;
+            background: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>Quản lý Bàn Café</h1>
+    <div class="container">
+        <h1>Danh sách món</h1>
 
-<div class="form-container">
-    <h3>Thêm / Sửa Bàn</h3>
-    <input id="tableName" type="text" placeholder="Tên bàn (VD: Bàn 1)">
-    <input id="tableSeats" type="number" placeholder="Số ghế">
-    <button id="saveBtn">Lưu</button>
-</div>
+        <div id="menu-list"></div>
 
-<h2>Danh sách bàn</h2>
-<div id="tableList" class="table-list"></div>
+        <button class="add-btn" onclick="addFood()">+ Thêm món</button>
+    </div>
 
-<script src="script.js"></script>
+
+    <script>
+        // Dữ liệu mẫu của menu
+        let foods = [
+            { name: "Cà phê đen", price: 20000, type: "Cà phê" },
+            { name: "Cà phê sữa", price: 25000, type: "Cà phê" },
+            { name: "Trà đào", price: 30000, type: "Trà" },
+            { name: "Nước suối", price: 10000, type: "Khác" }
+        ];
+
+        // Hiển thị danh sách món
+        function loadMenu() {
+            let list = document.getElementById("menu-list");
+            list.innerHTML = "";
+
+            foods.forEach(food => {
+                list.innerHTML += `
+                    <div class="menu-item">
+                        <span class="name">${food.name}</span>
+                        <span class="price">${food.price.toLocaleString()}đ</span>
+                        <span class="type">${food.type}</span>
+                    </div>
+                `;
+            });
+        }
+
+        // Thêm món bằng prompt (tùy chọn)
+        function addFood() {
+            let name = prompt("Tên món:");
+            let price = prompt("Giá món:");
+            let type = prompt("Loại món:");
+
+            if (name && price) {
+                foods.push({
+                    name: name,
+                    price: Number(price),
+                    type: type || "Khác"
+                });
+                loadMenu();
+            }
+        }
+
+        // Khi tải trang → Tự động load menu
+        loadMenu();
+    </script>
+
 </body>
 </html>
