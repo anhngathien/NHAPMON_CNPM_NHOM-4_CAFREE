@@ -1,104 +1,137 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <title>Xem danh sách món</title>
-
+    <meta charset="UTF-8" />
+    <title>US05 - Xem danh sách món</title>
     <style>
         body {
-            font-family: Arial;
-            padding: 20px;
-            background: #f4f4f4;
-        }
-        h1 { text-align: center; }
-
-        .container {
-            max-width: 700px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #aaa;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
         }
 
-        .menu-item {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            display: flex;
-            justify-content: space-between;
+        h1 {
+            text-align: center;
         }
 
-        .name { font-weight: bold; }
-        .price { color: green; }
-        .type { color: #555; }
-
-        .add-btn {
+        table {
             width: 100%;
-            padding: 10px;
-            background: green;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #333;
             color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        button {
+            padding: 6px 12px;
+            margin: 3px;
             border: none;
+            background: #3498db;
+            color: white;
             cursor: pointer;
-            margin-top: 15px;
-            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        button.delete {
+            background: #e74c3c;
+        }
+
+        #addBtn {
+            margin-bottom: 15px;
+            background: #2ecc71;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            font-size: 18px;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
-        <h1>Danh sách món</h1>
+    <h1>Danh Sách Món</h1>
 
-        <div id="menu-list"></div>
+    <button id="addBtn">+ Thêm Món</button>
 
-        <button class="add-btn" onclick="addFood()">+ Thêm món</button>
-    </div>
-
+    <div id="content"></div>
 
     <script>
-        // Dữ liệu mẫu của menu
-        let foods = [
-            { name: "Cà phê đen", price: 20000, type: "Cà phê" },
-            { name: "Cà phê sữa", price: 25000, type: "Cà phê" },
-            { name: "Trà đào", price: 30000, type: "Trà" },
-            { name: "Nước suối", price: 10000, type: "Khác" }
-        ];
+        // Tạo dữ liệu mẫu nếu LocalStorage đang trống
+        function initData() {
+            const sampleData = [
+                { id: 1, name: "Cà phê đen", price: 20000, category: "Cà phê" },
+                { id: 2, name: "Trà đào", price: 30000, category: "Trà" },
+                { id: 3, name: "Bạc xỉu", price: 25000, category: "Cà phê" }
+            ];
+            localStorage.setItem("menu", JSON.stringify(sampleData));
+        }
 
-        // Hiển thị danh sách món
+        // Lấy dữ liệu từ LocalStorage
         function loadMenu() {
-            let list = document.getElementById("menu-list");
-            list.innerHTML = "";
+            let data = localStorage.getItem("menu");
+            if (!data) {
+                initData();
+                data = localStorage.getItem("menu");
+            }
+            return JSON.parse(data);
+        }
 
-            foods.forEach(food => {
-                list.innerHTML += `
-                    <div class="menu-item">
-                        <span class="name">${food.name}</span>
-                        <span class="price">${food.price.toLocaleString()}đ</span>
-                        <span class="type">${food.type}</span>
-                    </div>
+        // Render bảng món
+        function renderMenu() {
+            const menu = loadMenu();
+            const content = document.getElementById("content");
+
+            if (menu.length === 0) {
+                content.innerHTML = `<div class="no-data">Chưa có dữ liệu</div>`;
+                return;
+            }
+
+            let html = `
+                <table>
+                    <tr>
+                        <th>Tên món</th>
+                        <th>Giá</th>
+                        <th>Loại món</th>
+                        <th>Hành động</th>
+                    </tr>
+            `;
+
+            menu.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${item.price.toLocaleString()} đ</td>
+                        <td>${item.category}</td>
+                        <td>
+                            <button>Sửa</button>
+                            <button class="delete">Xóa</button>
+                        </td>
+                    </tr>
                 `;
             });
+
+            html += `</table>`;
+            content.innerHTML = html;
         }
 
-        // Thêm món bằng prompt (tùy chọn)
-        function addFood() {
-            let name = prompt("Tên món:");
-            let price = prompt("Giá món:");
-            let type = prompt("Loại món:");
-
-            if (name && price) {
-                foods.push({
-                    name: name,
-                    price: Number(price),
-                    type: type || "Khác"
-                });
-                loadMenu();
-            }
-        }
-
-        // Khi tải trang → Tự động load menu
-        loadMenu();
+        renderMenu();
     </script>
 
 </body>
