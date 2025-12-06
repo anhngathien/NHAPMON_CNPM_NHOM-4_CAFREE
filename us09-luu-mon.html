@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>US09 - Lưu món</title>
+</head>
+<body>
+
+    <h2>Lưu Món</h2>
+
+    <form id="formMon">
+        <label>Tên món</label>
+        <input type="text" id="ten">
+
+        <label>Giá</label>
+        <input type="number" id="gia">
+
+        <label>Loại món</label>
+        <select id="loai">
+            <option value="">--Chọn loại--</option>
+            <option value="Đồ uống">Đồ uống</option>
+            <option value="Đồ ăn">Đồ ăn</option>
+        </select>
+
+        <button type="button" onclick="luuMon()">Lưu</button>
+    </form>
+
+    <script>
+        function luuMon() {
+            let ten = document.getElementById("ten").value.trim();
+            let gia = Number(document.getElementById("gia").value);
+            let loai = document.getElementById("loai").value;
+
+            // VALIDATE
+            if (ten === "") { alert("Tên không được để trống"); return; }
+            if (!gia || gia <= 0) { alert("Giá không hợp lệ"); return; }
+            if (loai === "") { alert("Chưa chọn loại món"); return; }
+
+            // LẤY DS MÓN
+            let dsMon = JSON.parse(localStorage.getItem("mon")) || [];
+
+            // TẠO MÓN MỚI
+            let mon = {
+                id: Date.now(),
+                ten: ten,
+                gia: gia,
+                loai: loai
+            };
+
+            // THÊM VÀO DANH SÁCH
+            dsMon.push(mon);
+
+            // LƯU LẠI
+            localStorage.setItem("mon", JSON.stringify(dsMon));
+
+            alert("Lưu món thành công!");
+            window.location.href = "us05-xem-danh-sach-mon.html";
+        }
+    </script>
+
+</body>
+</html>
