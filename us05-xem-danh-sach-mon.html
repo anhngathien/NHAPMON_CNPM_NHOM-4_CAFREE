@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>US05 - Xem danh sách món</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background: #333;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        button {
+            padding: 6px 12px;
+            margin: 3px;
+            border: none;
+            background: #3498db;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button.delete {
+            background: #e74c3c;
+        }
+
+        #addBtn {
+            margin-bottom: 15px;
+            background: #2ecc71;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Danh Sách Món</h1>
+
+    <button id="addBtn">+ Thêm Món</button>
+
+    <div id="content"></div>
+
+    <script>
+        // Tạo dữ liệu mẫu nếu LocalStorage đang trống
+        function initData() {
+            const sampleData = [
+                { id: 1, name: "Cà phê đen", price: 20000, category: "Cà phê" },
+                { id: 2, name: "Trà đào", price: 30000, category: "Trà" },
+                { id: 3, name: "Bạc xỉu", price: 25000, category: "Cà phê" }
+            ];
+            localStorage.setItem("menu", JSON.stringify(sampleData));
+        }
+
+        // Lấy dữ liệu từ LocalStorage
+        function loadMenu() {
+            let data = localStorage.getItem("menu");
+            if (!data) {
+                initData();
+                data = localStorage.getItem("menu");
+            }
+            return JSON.parse(data);
+        }
+
+        // Render bảng món
+        function renderMenu() {
+            const menu = loadMenu();
+            const content = document.getElementById("content");
+
+            if (menu.length === 0) {
+                content.innerHTML = `<div class="no-data">Chưa có dữ liệu</div>`;
+                return;
+            }
+
+            let html = `
+                <table>
+                    <tr>
+                        <th>Tên món</th>
+                        <th>Giá</th>
+                        <th>Loại món</th>
+                        <th>Hành động</th>
+                    </tr>
+            `;
+
+            menu.forEach(item => {
+                html += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${item.price.toLocaleString()} đ</td>
+                        <td>${item.category}</td>
+                        <td>
+                            <button>Sửa</button>
+                            <button class="delete">Xóa</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `</table>`;
+            content.innerHTML = html;
+        }
+
+        renderMenu();
+    </script>
+
+</body>
+</html>
