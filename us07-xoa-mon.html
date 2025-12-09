@@ -1,150 +1,90 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Sửa món – Caffree POS</title>
-
-<style>
-    :root{
-        --blue:#1e88e5;
-        --light:#f3f6f8;
-        --panel:#ffffff;
-        --accent:#00b894;
-        --muted:#9aa6b2;
-        --card:#ffffff;
-        --shadow:0 6px 18px rgba(22,40,60,0.08);
-        --price:#0b6a36;
-
-        font-family: Inter, system-ui, 'Segoe UI', Roboto, Arial;
-    }
-
-    body {
-        margin:0;
-        background: linear-gradient(180deg,#eef6fb 0%, #fbfdfd 100%);
-        height: 100vh;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-    }
-
-    .container{
-        background:var(--panel);
-        width:420px;
-        padding:28px;
-        border-radius:20px;
-        box-shadow:var(--shadow);
-    }
-
-    h2{
-        margin:0 0 20px;
-        font-size:22px;
-        color:#333;
-    }
-
-    .form-group{
-        margin-bottom:18px;
-        display:flex;
-        flex-direction:column;
-    }
-
-    label{
-        font-size:14px;
-        color:#555;
-        margin-bottom:6px;
-    }
-
-    input, select{
-        padding:12px 14px;
-        border:1px solid #ddd;
-        border-radius:10px;
-        font-size:15px;
-    }
-
-    input:focus{
-        outline:none;
-        border-color:var(--blue);
-    }
-
-    .btn{
-        margin-top:12px;
-        padding:14px;
-        width:100%;
-        border:none;
-        font-size:16px;
-        border-radius:12px;
-        cursor:pointer;
-        font-weight:600;
-    }
-
-    .save{
-        background:var(--blue);
-        color:#fff;
-    }
-
-    .cancel{
-        background:#ccc;
-        margin-top:10px;
-    }
-
-    /* Ảnh món */
-    .preview-img{
-        width:100%;
-        height:180px;
-        border-radius:12px;
-        object-fit:cover;
-        border:1px solid #ddd;
-        margin-bottom:10px;
-    }
-
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>US07 - Sửa Món</title>
+    <style>
+        :root {
+            --blue: #1e88e5;
+            --light: #f3f6fb;
+            --panel: #ffffff;
+            --accent: #00b894;
+            --muted: #9aa6b2;
+            --card: #ffffff;
+            --shadow: 0 6px 18px rgba(22, 40, 60, 0.08);
+            --price: #0b63a6;
+            font-family: Inter, system-ui, Roboto, Arial;
+        }
+        body {
+            background: linear-gradient(180deg, #eef6fb 0%, #fbfdff 100%);
+            margin: 0;
+        }
+        .container {
+            width: 420px;
+            margin: 40px auto;
+            background: var(--panel);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+        h2 {
+            margin: 0 0 20px;
+            font-size: 24px;
+            color: var(--blue);
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid #d0d7de;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            background: var(--blue);
+            border: none;
+            padding: 14px;
+            color: white;
+            border-radius: 12px;
+            font-size: 17px;
+            cursor: pointer;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
 </head>
-
 <body>
+    <div class="container">
+        <h2>Sửa món</h2>
 
-<div class="container">
-
-    <h2>✏️ Sửa món</h2>
-
-    <!-- hình món -->
-    <img src="img/placeholder.jpg" alt="Ảnh món" class="preview-img" id="preview">
-
-    <div class="form-group">
-        <label>Đổi ảnh món</label>
-        <input type="file" accept="image/*" onchange="showImage(event)">
-    </div>
-
-    <div class="form-group">
         <label>Tên món</label>
-        <input type="text" value="Cà phê sữa">
-    </div>
+        <input type="text" placeholder="Nhập tên món mới" />
 
-    <div class="form-group">
-        <label>Giá (VNĐ)</label>
-        <input type="number" value="25000">
-    </div>
+        <label>Giá</label>
+        <input type="number" placeholder="Nhập giá mới" />
 
-    <div class="form-group">
-        <label>Loại món</label>
+        <label>Danh mục</label>
         <select>
             <option>Cà phê</option>
-            <option>Trà trái cây</option>
-            <option>Nước ép</option>
             <option>Trà sữa</option>
+            <option>Đá xay</option>
+            <option>Bánh ngọt</option>
         </select>
+
+        <label>Hình ảnh</label>
+        <input type="file" />
+
+        <button>Lưu thay đổi</button>
     </div>
-
-    <button class="btn save">💾 Lưu thay đổi</button>
-    <button class="btn cancel">Hủy</button>
-
-</div>
-
-<script>
-function showImage(event){
-    let img = document.getElementById("preview");
-    img.src = URL.createObjectURL(event.target.files[0]);
-}
-</script>
-
 </body>
 </html>
