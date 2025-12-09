@@ -1,149 +1,150 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8" />
-    <title>US07 - Xóa món</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background: #f5f5f5;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sửa món – Caffree POS</title>
 
-        h1 {
-            text-align: center;
-        }
+<style>
+    :root{
+        --blue:#1e88e5;
+        --light:#f3f6f8;
+        --panel:#ffffff;
+        --accent:#00b894;
+        --muted:#9aa6b2;
+        --card:#ffffff;
+        --shadow:0 6px 18px rgba(22,40,60,0.08);
+        --price:#0b6a36;
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            margin-top: 20px;
-        }
+        font-family: Inter, system-ui, 'Segoe UI', Roboto, Arial;
+    }
 
-        table, th, td {
-            border: 1px solid #ddd;
-        }
+    body {
+        margin:0;
+        background: linear-gradient(180deg,#eef6fb 0%, #fbfdfd 100%);
+        height: 100vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    }
 
-        th {
-            background: #333;
-            color: white;
-            padding: 10px;
-        }
+    .container{
+        background:var(--panel);
+        width:420px;
+        padding:28px;
+        border-radius:20px;
+        box-shadow:var(--shadow);
+    }
 
-        td {
-            padding: 10px;
-            text-align: center;
-        }
+    h2{
+        margin:0 0 20px;
+        font-size:22px;
+        color:#333;
+    }
 
-        button {
-            padding: 6px 12px;
-            margin: 3px;
-            border: none;
-            background: #3498db;
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-        }
+    .form-group{
+        margin-bottom:18px;
+        display:flex;
+        flex-direction:column;
+    }
 
-        button.delete {
-            background: #e74c3c;
-        }
+    label{
+        font-size:14px;
+        color:#555;
+        margin-bottom:6px;
+    }
 
-        .no-data {
-            text-align: center;
-            padding: 20px;
-            background: white;
-            font-size: 18px;
-        }
-    </style>
+    input, select{
+        padding:12px 14px;
+        border:1px solid #ddd;
+        border-radius:10px;
+        font-size:15px;
+    }
+
+    input:focus{
+        outline:none;
+        border-color:var(--blue);
+    }
+
+    .btn{
+        margin-top:12px;
+        padding:14px;
+        width:100%;
+        border:none;
+        font-size:16px;
+        border-radius:12px;
+        cursor:pointer;
+        font-weight:600;
+    }
+
+    .save{
+        background:var(--blue);
+        color:#fff;
+    }
+
+    .cancel{
+        background:#ccc;
+        margin-top:10px;
+    }
+
+    /* Ảnh món */
+    .preview-img{
+        width:100%;
+        height:180px;
+        border-radius:12px;
+        object-fit:cover;
+        border:1px solid #ddd;
+        margin-bottom:10px;
+    }
+
+</style>
 </head>
 
-<body onload="renderMenu()">
+<body>
 
-    <h1>Danh Sách Món (US07 - Xóa món)</h1>
+<div class="container">
 
-    <div id="content"></div>
+    <h2>✏️ Sửa món</h2>
 
-    <script>
-        const STORAGE_KEY = "menu";
+    <!-- hình món -->
+    <img src="img/placeholder.jpg" alt="Ảnh món" class="preview-img" id="preview">
 
-        // Tạo dữ liệu mẫu nếu LocalStorage đang trống hoàn toàn
-        function initData() {
-            const sampleData = [
-                { id: 1, name: "Cà phê đen",  price: 20000, category: "Cà phê" },
-                { id: 2, name: "Trà đào",     price: 30000, category: "Trà" },
-                { id: 3, name: "Bạc xỉu",     price: 25000, category: "Cà phê" }
-            ];
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(sampleData));
-        }
+    <div class="form-group">
+        <label>Đổi ảnh món</label>
+        <input type="file" accept="image/*" onchange="showImage(event)">
+    </div>
 
-        // Lấy dữ liệu từ LocalStorage
-        function loadMenu() {
-            let data = localStorage.getItem(STORAGE_KEY);
-            if (!data) {
-                initData();
-                data = localStorage.getItem(STORAGE_KEY);
-            }
-            return JSON.parse(data);
-        }
+    <div class="form-group">
+        <label>Tên món</label>
+        <input type="text" value="Cà phê sữa">
+    </div>
 
-        // Lưu dữ liệu vào LocalStorage
-        function saveMenu(menu) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(menu));
-        }
+    <div class="form-group">
+        <label>Giá (VNĐ)</label>
+        <input type="number" value="25000">
+    </div>
 
-        // HIỂN THỊ DANH SÁCH MÓN
-        function renderMenu() {
-            const menu = loadMenu();
-            const content = document.getElementById("content");
+    <div class="form-group">
+        <label>Loại món</label>
+        <select>
+            <option>Cà phê</option>
+            <option>Trà trái cây</option>
+            <option>Nước ép</option>
+            <option>Trà sữa</option>
+        </select>
+    </div>
 
-            if (!menu || menu.length === 0) {
-                content.innerHTML = `<div class="no-data">Chưa có dữ liệu</div>`;
-                return;
-            }
+    <button class="btn save">💾 Lưu thay đổi</button>
+    <button class="btn cancel">Hủy</button>
 
-            let html = `
-                <table>
-                    <tr>
-                        <th>Tên món</th>
-                        <th>Giá</th>
-                        <th>Loại món</th>
-                        <th>Hành động</th>
-                    </tr>
-            `;
+</div>
 
-            menu.forEach(item => {
-                html += `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td>${item.price.toLocaleString()} đ</td>
-                        <td>${item.category}</td>
-                        <td>
-                            <button class="delete" onclick="deleteItem(${item.id})">
-                                Xóa
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            html += `</table>`;
-            content.innerHTML = html;
-        }
-
-        // US07: XÓA MÓN
-        function deleteItem(id) {
-            const confirmDelete = confirm("Bạn có chắc muốn xóa?");
-            if (!confirmDelete) return;
-
-            let menu = loadMenu();
-            menu = menu.filter(item => item.id !== id);
-
-            saveMenu(menu);
-            renderMenu();
-        }
-    </script>
+<script>
+function showImage(event){
+    let img = document.getElementById("preview");
+    img.src = URL.createObjectURL(event.target.files[0]);
+}
+</script>
 
 </body>
 </html>
