@@ -2,61 +2,142 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>US09 - Lưu món</title>
-</head>
-<body>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lưu món</title>
 
-    <h2>Lưu Món</h2>
-
-    <form id="formMon">
-        <label>Tên món</label>
-        <input type="text" id="ten">
-
-        <label>Giá</label>
-        <input type="number" id="gia">
-
-        <label>Loại món</label>
-        <select id="loai">
-            <option value="">--Chọn loại--</option>
-            <option value="Đồ uống">Đồ uống</option>
-            <option value="Đồ ăn">Đồ ăn</option>
-        </select>
-
-        <button type="button" onclick="luuMon()">Lưu</button>
-    </form>
-
-    <script>
-        function luuMon() {
-            let ten = document.getElementById("ten").value.trim();
-            let gia = Number(document.getElementById("gia").value);
-            let loai = document.getElementById("loai").value;
-
-            // VALIDATE
-            if (ten === "") { alert("Tên không được để trống"); return; }
-            if (!gia || gia <= 0) { alert("Giá không hợp lệ"); return; }
-            if (loai === "") { alert("Chưa chọn loại món"); return; }
-
-            // LẤY DS MÓN
-            let dsMon = JSON.parse(localStorage.getItem("mon")) || [];
-
-            // TẠO MÓN MỚI
-            let mon = {
-                id: Date.now(),
-                ten: ten,
-                gia: gia,
-                loai: loai
-            };
-
-            // THÊM VÀO DANH SÁCH
-            dsMon.push(mon);
-
-            // LƯU LẠI
-            localStorage.setItem("mon", JSON.stringify(dsMon));
-
-            alert("Lưu món thành công!");
-            window.location.href = "us05-xem-danh-sach-mon.html";
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(135deg, #84fab0, #8fd3f4);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-    </script>
 
+        .container {
+            width: 450px;
+            background: #ffffffdd;
+            backdrop-filter: blur(8px);
+            padding: 35px;
+            border-radius: 22px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+            animation: fadeIn 0.7s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+            font-size: 26px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            font-size: 15px;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+            color: #444;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 14px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.25s;
+            background: #fff;
+        }
+
+        input:focus, select:focus {
+            border-color: #84fab0;
+            box-shadow: 0 0 8px rgba(132, 250, 176, 0.3);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #84fab0;
+            border: none;
+            color: white;
+            border-radius: 14px;
+            font-size: 17px;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .btn:hover {
+            background: #74e8a3;
+        }
+
+        .upload-box {
+            border: 2px dashed #aaa;
+            padding: 18px;
+            border-radius: 14px;
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+            background: #fff;
+        }
+
+        .upload-box:hover {
+            border-color: #84fab0;
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <h2>Lưu món mới</h2>
+
+        <div class="form-group">
+            <label>Tên món</label>
+            <input type="text" placeholder="Nhập tên món">
+        </div>
+
+        <div class="form-group">
+            <label>Loại món</label>
+            <select>
+                <option selected disabled>-- Chọn loại món --</option>
+                <option>Cà phê</option>
+                <option>Trà sữa</option>
+                <option>Nước ép</option>
+                <option>Đá xay</option>
+                <option>Bánh ngọt</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Giá (VND)</label>
+            <input type="number" placeholder="Nhập giá món">
+        </div>
+
+        <div class="form-group">
+            <label>Hình ảnh</label>
+            <div class="upload-box">
+                Chọn ảnh món<br>
+                <input type="file" style="margin-top:10px;">
+            </div>
+        </div>
+
+        <button class="btn">Lưu món</button>
+    </div>
 </body>
 </html>
