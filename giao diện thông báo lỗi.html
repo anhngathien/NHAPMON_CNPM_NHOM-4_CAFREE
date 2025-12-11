@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            width: 360px;
+            background: #ffffffee;
+            backdrop-filter: blur(6px);
+            padding: 40px;
+            border-radius: 22px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 14px;
+            border: 2px solid #ddd;
+            font-size: 15px;
+            outline: none;
+            transition: 0.25s;
+        }
+
+        .input-group input:focus {
+            border-color: #6a11cb;
+            box-shadow: 0 0 8px rgba(106, 17, 203, 0.2);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #6a11cb;
+            border: none;
+            color: #fff;
+            border-radius: 14px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .btn-login:hover {
+            background: #5012a0;
+        }
+
+        .bottom-text {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #444;
+        }
+
+        .bottom-text a {
+            color: #6a11cb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <h2>Đăng Nhập</h2>
+
+        <div class="input-group">
+            <input type="text" placeholder="Tên đăng nhập">
+        </div>
+
+        <div class="input-group">
+            <input type="password" placeholder="Mật khẩu">
+        </div>
+
+        <button class="btn-login">Đăng nhập</button>
+
+        <p class="bottom-text">
+            Chưa có tài khoản? <a href="#">Đăng ký</a>
+        </p>
+    </div>
+
+</body>
+</html>

@@ -1,138 +1,153 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8" />
-    <title>US05 - Xem danh sách món</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách món</title>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 0;
         }
 
-        h1 {
+        .container {
+            width: 820px;
+            background: #ffffffdd;
+            backdrop-filter: blur(8px);
+            padding: 30px;
+            border-radius: 22px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+            animation: fadeIn 0.7s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
             text-align: center;
+            font-size: 28px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            color: #333;
         }
 
-        table {
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .item {
+            background: #fff;
+            border-radius: 18px;
+            padding: 15px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+            transition: 0.25s;
+        }
+
+        .item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.16);
+        }
+
+        .item img {
             width: 100%;
-            border-collapse: collapse;
-            background: white;
-            margin-top: 20px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 14px;
         }
 
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-
-        th {
-            background: #333;
-            color: white;
-            padding: 10px;
-        }
-
-        td {
-            padding: 10px;
-            text-align: center;
-        }
-
-        button {
-            padding: 6px 12px;
-            margin: 3px;
-            border: none;
-            background: #3498db;
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        button.delete {
-            background: #e74c3c;
-        }
-
-        #addBtn {
-            margin-bottom: 15px;
-            background: #2ecc71;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 20px;
-            background: white;
+        .item h3 {
+            margin: 12px 0 6px;
             font-size: 18px;
+            font-weight: 600;
         }
+
+        .item p {
+            margin: 0;
+            font-size: 15px;
+            color: #666;
+        }
+
+        .price {
+            margin-top: 8px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #a060e8;
+        }
+
+        .btn-edit {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #a18cd1;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.25s;
+            width: 100%;
+        }
+
+        .btn-edit:hover {
+            background: #8b79c5;
+        }
+
     </style>
 </head>
 
 <body>
+    <div class="container">
+        <h2>Danh sách món</h2>
 
-    <h1>Danh Sách Món</h1>
+        <div class="menu-grid">
 
-    <button id="addBtn">+ Thêm Món</button>
+            <!-- Món 1 -->
+            <div class="item">
+                <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=800" alt="Capuchino">
+                <h3>Cappuccino</h3>
+                <p>Cà phê</p>
+                <div class="price">35.000đ</div>
+                <button class="btn-edit">Sửa món</button>
+            </div>
 
-    <div id="content"></div>
+            <!-- Món 2 -->
+            <div class="item">
+                <img src="https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?w=800" alt="Trà đào">
+                <h3>Trà đào</h3>
+                <p>Trà trái cây</p>
+                <div class="price">30.000đ</div>
+                <button class="btn-edit">Sửa món</button>
+            </div>
 
-    <script>
-        // Tạo dữ liệu mẫu nếu LocalStorage đang trống
-        function initData() {
-            const sampleData = [
-                { id: 1, name: "Cà phê đen", price: 20000, category: "Cà phê" },
-                { id: 2, name: "Trà đào", price: 30000, category: "Trà" },
-                { id: 3, name: "Bạc xỉu", price: 25000, category: "Cà phê" }
-            ];
-            localStorage.setItem("menu", JSON.stringify(sampleData));
-        }
+            <!-- Món 3 -->
+            <div class="item">
+                <img src="https://images.unsplash.com/photo-1572441710534-680f8e2eb28d?w=800" alt="Bánh ngọt">
+                <h3>Bánh mousse dâu</h3>
+                <p>Bánh ngọt</p>
+                <div class="price">28.000đ</div>
+                <button class="btn-edit">Sửa món</button>
+            </div>
 
-        // Lấy dữ liệu từ LocalStorage
-        function loadMenu() {
-            let data = localStorage.getItem("menu");
-            if (!data) {
-                initData();
-                data = localStorage.getItem("menu");
-            }
-            return JSON.parse(data);
-        }
+            <!-- Món 4 -->
+            <div class="item">
+                <img src="https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800" alt="Nước ép cam">
+                <h3>Nước ép cam</h3>
+                <p>Nước ép</p>
+                <div class="price">25.000đ</div>
+                <button class="btn-edit">Sửa món</button>
+            </div>
 
-        // Render bảng món
-        function renderMenu() {
-            const menu = loadMenu();
-            const content = document.getElementById("content");
-
-            if (menu.length === 0) {
-                content.innerHTML = `<div class="no-data">Chưa có dữ liệu</div>`;
-                return;
-            }
-
-            let html = `
-                <table>
-                    <tr>
-                        <th>Tên món</th>
-                        <th>Giá</th>
-                        <th>Loại món</th>
-                        <th>Hành động</th>
-                    </tr>
-            `;
-
-            menu.forEach(item => {
-                html += `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td>${item.price.toLocaleString()} đ</td>
-                        <td>${item.category}</td>
-                        <td>
-                            <button>Sửa</button>
-                            <button class="delete">Xóa</button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            html += `</table>`;
-            content.innerHTML = html;
-        }
-
-        renderMenu();
-    </script>
-
+        </div>
+    </div>
 </body>
 </html>
