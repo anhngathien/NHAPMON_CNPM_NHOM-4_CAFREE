@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!doctype html>
 <html lang="vi">
 <head>
@@ -273,5 +274,163 @@
   renderMenu(menu);
   renderOrder();
 </script>
+=======
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thêm Món – CAFREE</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #FFECD2;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+    }
+
+    .container {
+        width: 400px;
+        background: white;
+        margin-top: 30px;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .title {
+        text-align: center;
+        font-size: 26px;
+        font-weight: bold;
+        color: #D2691E;
+        margin-bottom: 20px;
+    }
+
+    .image-box {
+        width: 160px;
+        height: 160px;
+        border: 2px dashed #D2691E;
+        border-radius: 18px;
+        background: #FFF7EF;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .image-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .plus {
+        font-size: 40px;
+        color: #D2691E;
+    }
+
+    .input-group {
+        margin-top: 15px;
+    }
+
+    label {
+        font-weight: bold;
+        color: #8B4513;
+        font-size: 16px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        margin-top: 6px;
+        border: 1.5px solid #f1c9a9;
+        border-radius: 12px;
+        outline: none;
+    }
+
+    input:focus, select:focus {
+        border-color: #D2691E;
+        box-shadow: 0 0 4px rgba(210,105,30,0.5);
+    }
+
+    .btn-save {
+        margin-top: 25px;
+        width: 100%;
+        background: #D2691E;
+        color: white;
+        padding: 14px;
+        font-size: 18px;
+        border: none;
+        border-radius: 14px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .btn-save:hover {
+        background: #b85c18;
+    }
+</style>
+
+<script>
+    function previewImage(event) {
+        const file = event.target.files[0];
+        const imgBox = document.getElementById("imgPreview");
+
+        if (file) {
+            imgBox.innerHTML = `<img src="${URL.createObjectURL(file)}">`;
+        }
+    }
+</script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="title">Thêm Món</div>
+
+    <!-- IMAGE UPLOAD -->
+    <label>
+        <div class="image-box" id="imgPreview">
+            <div class="plus">+</div>
+        </div>
+        <input type="file" accept="image/*" style="display:none" onchange="previewImage(event)">
+    </label>
+
+    <!-- INPUTS -->
+    <div class="input-group">
+        <label>Tên món</label>
+        <input type="text" placeholder="Nhập tên món...">
+    </div>
+
+    <div class="input-group">
+        <label>Giá (VNĐ)</label>
+        <input type="number" placeholder="Nhập giá...">
+    </div>
+
+    <div class="input-group">
+        <label>Loại món</label>
+        <select>
+            <option>Cafe</option>
+            <option>Trà</option>
+            <option>Đá xay</option>
+            <option>Nước ngọt</option>
+            <option>Khác</option>
+        </select>
+    </div>
+
+    <!-- SAVE BUTTON -->
+    <button class="btn-save">LƯU</button>
+
+</div>
+
+>>>>>>> fe97c22c066430fd1cae816f8e09785d9d4fac8b
 </body>
 </html>
