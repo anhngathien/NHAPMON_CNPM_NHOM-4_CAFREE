@@ -1,0 +1,70 @@
+/* Thiết lập cơ bản (reset) */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6; /* Màu nền nhẹ nhàng */
+    color: #333;
+}
+
+/* Kiểu cho Header/Thanh điều hướng */
+.header {
+    background-color: #5d4037; /* Màu nâu cafe đậm */
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between; /* Đẩy logo và nav ra hai bên */
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.nav a:hover,
+.nav a.active { /* Thêm active class cho JS */
+    background-color: #8d6e63; /* Màu nâu nhạt hơn khi hover */
+}
+
+/* Kiểu cho Khu vực nội dung chính */
+.main-content {
+    padding: 30px;
+    max-width: 1200px; 
+    margin: 20px auto; 
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    min-height: 70vh; /* Đảm bảo chiều cao đủ lớn */
+}
+
+/* Ẩn/hiện các phần nội dung (dùng cho JavaScript) */
+.content-section {
+    display: none; /* Mặc định ẩn tất cả */
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+}
+
+.content-section.active {
+    display: block; /* Chỉ hiển thị phần đang được chọn */
+}
+
+/* Kiểu cho Footer */
+.footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #eee;
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 40px;
+}

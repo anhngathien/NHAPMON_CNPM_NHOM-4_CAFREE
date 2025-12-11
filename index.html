@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Quán Cafe</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">Quản Lý Cafe</div>
+        <nav class="nav">
+            <a href="#dashboard" class="nav-link">Tổng Quan</a>
+            <a href="#menu" class="nav-link">Quản Lý Menu</a>
+            <a href="#orders" class="nav-link">Đơn Hàng</a>
+            <a href="#settings" class="nav-link">Cài Đặt</a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        
+        <section id="dashboard" class="content-section active">
+            <h2>📊 Bảng Điều Khiển Tổng Quan</h2>
+            <p>Đây là khu vực hiển thị các thông tin tổng quan, doanh thu, v.v.</p>
+            </section>
+
+        <section id="menu" class="content-section">
+            <h2>📝 Quản Lý Menu</h2>
+            <div id="menu-management-container">
+                <button onclick="console.log('Mở form Thêm món')">➕ Thêm Món Mới</button>
+                <p>Danh sách các món ăn/thức uống sẽ hiển thị ở đây. (Nhớ đặt code chức năng của bạn vào đây)</p>
+            </div>
+        </section>
+
+        <section id="orders" class="content-section">
+            <h2>🧾 Quản Lý Đơn Hàng</h2>
+            <p>Đây là khu vực quản lý các đơn hàng đang chờ và đã hoàn thành.</p>
+            </section>
+
+        <section id="settings" class="content-section">
+            <h2>⚙️ Cài Đặt Hệ Thống</h2>
+            <p>Các thiết lập chung của quán.</p>
+            </section>
+
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 Dự án Quản Lý Cafe. Nhóm 4.</p>
+    </footer>
+    
+    <script src="js/scripts.js"></script>
+</body>
+</html>
