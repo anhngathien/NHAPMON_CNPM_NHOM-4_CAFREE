@@ -1,54 +1,277 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Quán Cafe</title>
-    <link rel="stylesheet" href="css/styles.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>POS Pro — Demo</title>
+<style>
+  :root{--accent:#ff7f2a;--bg:#eef1f4;--card:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:#1f2937}
+  /* Header */
+  header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:linear-gradient(90deg,var(--accent),#ff9b4a);color:white}
+  .left-controls{display:flex;gap:10px;align-items:center}
+  .btn{background:white;color:var(--accent);border:none;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer}
+  .user-info{display:flex;gap:8px;align-items:center}
+  .avatar{width:36px;height:36px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent)}
+  .logout{background:transparent;border:1px solid rgba(255,255,255,0.35);color:white;padding:6px 10px;border-radius:8px;cursor:pointer}
+
+  /* Layout */
+  .wrap{display:flex;gap:16px;padding:16px}
+  .panel{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(15,23,42,0.08)}
+  .catalog{width:34%;display:flex;flex-direction:column;gap:12px}
+  .menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+  .product{border-radius:10px;padding:10px;text-align:center;cursor:pointer;border:1px solid #f0f0f0;background:#fafafa;transition:transform .14s,box-shadow .14s}
+  .product:hover{transform:translateY(-6px);box-shadow:0 8px 20px rgba(15,23,42,0.08)}
+  .product img{width:72px;height:72px;object-fit:cover;border-radius:8px}
+  .product .name{font-weight:600;margin-top:8px}
+  .product .price{color:#9aa4b2;margin-top:6px}
+
+  .right{flex:1;display:flex;flex-direction:column;gap:12px}
+  .search-row{display:flex;gap:12px;align-items:center}
+  .search{flex:1;padding:10px;border-radius:10px;border:1px solid #e6e9ee}
+
+  /* Cart */
+  .cart{width:320px;padding:12px}
+  .cart h4{margin:4px 0 12px}
+  .cart-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;padding-right:6px}
+  .cart-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;border:1px solid #f2f4f7}
+  .qty{width:30px;text-align:center}
+  .total-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:18px;font-weight:700}
+  .pay{margin-top:10px;padding:12px;border-radius:10px;background:var(--accent);color:white;border:none;width:100%;font-weight:700;cursor:pointer}
+
+  /* Manager panel */
+  .manager-panel{display:none;padding:12px;border-radius:10px;background:#fff}
+  .manager-panel.active{display:block}
+  .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#f3f4f6;font-weight:600}
+
+  /* Login modal */
+  .overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,0.45)}
+  .modal{width:360px;background:white;padding:20px;border-radius:12px}
+  .field{display:flex;flex-direction:column;margin-bottom:10px}
+  .field label{font-size:13px;margin-bottom:6px}
+  .field input, .field select{padding:10px;border:1px solid #e6e9ee;border-radius:8px}
+  .login-btn{width:100%;padding:10px;border-radius:8px;border:none;background:var(--accent);color:white;font-weight:700;cursor:pointer}
+
+  footer{padding:12px;text-align:center;color:#6b7280}
+
+  @media (max-width:900px){.wrap{flex-direction:column}.catalog{width:100%}.cart{width:100%}}
+</style>
 </head>
 <body>
+<header>
+  <div class="left-controls">
+    <button class="btn" id="newOrder">Tạo mới order</button>
+    <div class="badge" id="roleBadge">Chưa đăng nhập</div>
+  </div>
+  <div class="user-info">
+    <div id="welcomeText">Xin chào, Khách</div>
+    <div class="avatar" id="avatar">?</div>
+    <button class="logout" id="btnLogout" style="display:none">Đăng xuất</button>
+  </div>
+</header>
 
-    <header class="header">
-        <div class="logo">Quản Lý Cafe</div>
-        <nav class="nav">
-            <a href="#dashboard" class="nav-link">Tổng Quan</a>
-            <a href="#menu" class="nav-link">Quản Lý Menu</a>
-            <a href="#orders" class="nav-link">Đơn Hàng</a>
-            <a href="#settings" class="nav-link">Cài Đặt</a>
-        </nav>
-    </header>
+<div class="wrap">
+  <div class="catalog panel">
+    <h3 style="margin-top:0">Danh mục món</h3>
+    <input class="search" id="search" placeholder="Tìm món..." />
 
-    <main class="main-content">
-        
-        <section id="dashboard" class="content-section active">
-            <h2>📊 Bảng Điều Khiển Tổng Quan</h2>
-            <p>Đây là khu vực hiển thị các thông tin tổng quan, doanh thu, v.v.</p>
-            </section>
+    <div class="menu-grid" id="menuGrid">
+      <!-- Sản phẩm sẽ được render bằng JS -->
+    </div>
 
-        <section id="menu" class="content-section">
-            <h2>📝 Quản Lý Menu</h2>
-            <div id="menu-management-container">
-                <button onclick="console.log('Mở form Thêm món')">➕ Thêm Món Mới</button>
-                <p>Danh sách các món ăn/thức uống sẽ hiển thị ở đây. (Nhớ đặt code chức năng của bạn vào đây)</p>
-            </div>
-        </section>
+    <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+      <button class="btn" id="btnLogin">Đăng nhập</button>
+      <button class="btn" id="btnManager" style="display:none">Quản lý</button>
+    </div>
+  </div>
 
-        <section id="orders" class="content-section">
-            <h2>🧾 Quản Lý Đơn Hàng</h2>
-            <p>Đây là khu vực quản lý các đơn hàng đang chờ và đã hoàn thành.</p>
-            </section>
+  <div class="right">
+    <div class="panel">
+      <div class="search-row">
+        <input class="search" placeholder="Tìm/lọc sản phẩm" id="filter" />
+        <div class="badge" id="storeStatus">Status: Hoạt động</div>
+      </div>
 
-        <section id="settings" class="content-section">
-            <h2>⚙️ Cài Đặt Hệ Thống</h2>
-            <p>Các thiết lập chung của quán.</p>
-            </section>
+      <div class="manager-panel" id="managerPanel">
+        <h4>Panel Quản lý</h4>
+        <p>Chỉ Quản lý (quản lý mới thấy): Thêm/Sửa/Xóa sản phẩm, Xem báo cáo.</p>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn">Thêm sản phẩm</button>
+          <button class="btn">Báo cáo</button>
+        </div>
+      </div>
 
-    </main>
+      <div style="margin-top:12px">
+        <h4>Menu</h4>
+        <div id="menuContainer" class="menu-grid"></div>
+      </div>
+    </div>
 
-    <footer class="footer">
-        <p>&copy; 2025 Dự án Quản Lý Cafe. Nhóm 4.</p>
-    </footer>
-    
-    <script src="js/scripts.js"></script>
+    <div class="cart panel" id="cartPanel" style="align-self:flex-start">
+      <h4>Hóa đơn</h4>
+      <div class="cart-list" id="cartList"></div>
+      <div class="total-row">
+        <div>Tổng</div>
+        <div id="totalAmount">0 đ</div>
+      </div>
+      <button class="pay" id="payBtn">Thanh toán</button>
+    </div>
+  </div>
+
+  <div class="panel cart">
+    <h4>Nhật ký hoạt động</h4>
+    <div id="log" style="max-height:480px;overflow:auto;font-size:13px;color:#374151"></div>
+  </div>
+</div>
+
+<footer>POS Demo — Phiên bản thử nghiệm</footer>
+
+<!-- Login modal -->
+<div id="loginModal" class="overlay" style="display:none">
+  <div class="modal">
+    <h3>Đăng nhập</h3>
+    <div class="field">
+      <label>Tài khoản</label>
+      <select id="username">
+        <option value="manager">quảnly (Quản lý)</option>
+        <option value="staff">nv1 (Nhân viên)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Mật khẩu (demo)</label>
+      <input type="password" id="password" value="1234" />
+    </div>
+    <button class="login-btn" id="doLogin">Đăng nhập</button>
+  </div>
+</div>
+
+<script>
+// Dữ liệu sản phẩm mẫu
+const products = [
+  {id:1,name:'Trà đào 1 lít',price:45000,img:'https://via.placeholder.com/72?text=Tea'},
+  {id:2,name:'Trà đào 700ml',price:38000,img:'https://via.placeholder.com/72?text=700ml'},
+  {id:3,name:'Trà sữa mật nho đen',price:18000,img:'https://via.placeholder.com/72?text=Milk'},
+  {id:4,name:'Sương sáo',price:14000,img:'https://via.placeholder.com/72?text=Topping'},
+  {id:5,name:'Cá viên chiên',price:15000,img:'https://via.placeholder.com/72?text=Snack'},
+  {id:6,name:'Chạo cá',price:15000,img:'https://via.placeholder.com/72?text=Food'},
+  {id:7,name:'Trà sữa bánh flan',price:16000,img:'https://via.placeholder.com/72?text=Flan'},
+  {id:8,name:'Trà sữa dừa',price:13000,img:'https://via.placeholder.com/72?text=Coco'},
+  {id:9,name:'Trà sữa kem muối',price:16000,img:'https://via.placeholder.com/72?text=Salt'}
+];
+
+// State
+let state = {user:null,role:null,cart:[]};
+
+// Helpers
+const q = (s)=>document.querySelector(s);
+const qAll = (s)=>document.querySelectorAll(s);
+
+function money(v){return v.toString().replace(/\\B(?=(\\d{3})+(?!\\d))/g,",") + ' đ'}
+
+// Render functions
+function renderMenu(){
+  const grid = q('#menuGrid');
+  grid.innerHTML = '';
+  products.forEach(p=>{
+    const el = document.createElement('div'); el.className='product';
+    el.innerHTML = `<img src="${p.img}" alt="${p.name}"><div class="name">${p.name}</div><div class="price">${money(p.price)}</div>`;
+    el.onclick = ()=>addToCart(p.id);
+    grid.appendChild(el);
+  });
+  // duplicate to menuContainer
+  q('#menuContainer').innerHTML = grid.innerHTML;
+  // attach click handlers there too
+  q('#menuContainer').querySelectorAll('.product').forEach((el,i)=>{ el.onclick = ()=>addToCart(products[i].id);} )
+}
+
+function renderCart(){
+  const list = q('#cartList'); list.innerHTML='';
+  state.cart.forEach(item=>{
+    const div = document.createElement('div'); div.className='cart-item';
+    div.innerHTML = `<div style="flex:1"><div style='font-weight:700'>${item.name}</div><div style='font-size:13px;color:#6b7280'>${money(item.price)}</div></div>
+      <div style='display:flex;align-items:center;gap:6px'>
+        <button title='Giảm' onclick='changeQty(${item.id}, -1)' style='padding:6px;border-radius:6px;border:none;background:#f3f4f6;cursor:pointer' >−</button>
+        <div class='qty'>${item.qty}</div>
+        <button title='Tăng' onclick='changeQty(${item.id}, 1)' style='padding:6px;border-radius:6px;border:none;background:#f3f4f6;cursor:pointer' >+</button>
+      </div>`;
+    list.appendChild(div);
+  });
+  const total = state.cart.reduce((s,i)=>s + i.price*i.qty,0);
+  q('#totalAmount').innerText = money(total);
+}
+
+// Cart operations
+function addToCart(id){
+  const p = products.find(x=>x.id===id);
+  const found = state.cart.find(x=>x.id===id);
+  if(found) found.qty++;
+  else state.cart.push({...p,qty:1});
+  log(`Thêm ${p.name} vào hóa đơn`);
+  renderCart();
+}
+function changeQty(id,delta){
+  const idx = state.cart.findIndex(x=>x.id===id);
+  if(idx===-1) return;
+  state.cart[idx].qty += delta;
+  if(state.cart[idx].qty<=0) { log(`Xóa ${state.cart[idx].name} khỏi hóa đơn`); state.cart.splice(idx,1); }
+  renderCart();
+}
+
+// Logging
+function log(text){
+  const el = q('#log');
+  const time = new Date().toLocaleTimeString();
+  el.innerHTML = `<div>[${time}] ${text}</div>` + el.innerHTML;
+}
+
+// Auth (demo)
+q('#btnLogin').onclick = ()=>{ q('#loginModal').style.display='flex'; }
+q('#doLogin').onclick = ()=>{
+  const user = q('#username').value; const pass = q('#password').value;
+  if(pass !== '1234'){ alert('Sai mật khẩu demo (mật khẩu là 1234)'); return; }
+  if(user === 'manager') { state.user='Quản lý'; state.role='manager'; } else { state.user='Nhân viên 1'; state.role='staff'; }
+  applyAuth();
+  q('#loginModal').style.display='none';
+  log(`${state.user} đăng nhập`);
+}
+
+q('#btnLogout').onclick = ()=>{ state.user=null; state.role=null; state.cart=[]; applyAuth(); log('Đã đăng xuất'); }
+
+function applyAuth(){
+  if(state.user){
+    q('#welcomeText').innerText = `Xin chào, ${state.user}`;
+    q('#avatar').innerText = state.user.split(' ').map(s=>s[0]).slice(0,2).join('');
+    q('#btnLogout').style.display='inline-block';
+    q('#roleBadge').innerText = state.role === 'manager'? 'Quản lý' : 'Nhân viên';
+    q('#btnManager').style.display = state.role === 'manager' ? 'inline-block' : 'none';
+    q('#managerPanel').classList.toggle('active', state.role === 'manager');
+  } else {
+    q('#welcomeText').innerText = 'Xin chào, Khách';
+    q('#avatar').innerText = '?';
+    q('#btnLogout').style.display='none';
+    q('#roleBadge').innerText = 'Chưa đăng nhập';
+    q('#btnManager').style.display='none';
+    q('#managerPanel').classList.remove('active');
+  }
+  renderCart();
+}
+
+q('#payBtn').onclick = ()=>{
+  if(state.cart.length===0){ alert('Hóa đơn rỗng'); return; }
+  const total = state.cart.reduce((s,i)=>s+i.price*i.qty,0);
+  if(!state.user){ if(!confirm('Bạn chưa đăng nhập. Tiếp tục thanh toán như khách?')) return; }
+  alert(`Thanh toán thành công — Tổng: ${money(total)}`);
+  log(`Thanh toán: ${money(total)} bởi ${state.user || 'Khách'}`);
+  state.cart = []; renderCart();
+}
+
+// Search / filter
+q('#search').addEventListener('input', (e)=>{ const v=e.target.value.toLowerCase(); q('#menuGrid').querySelectorAll('.product').forEach((el,i)=>{ const show = products[i].name.toLowerCase().includes(v); el.style.display = show? 'block':'none'; }); });
+q('#filter').addEventListener('input', (e)=>{ const v=e.target.value.toLowerCase(); q('#menuContainer').querySelectorAll('.product').forEach((el,i)=>{ const show = products[i].name.toLowerCase().includes(v); el.style.display = show? 'block':'none'; }); });
+
+// Init
+renderMenu(); applyAuth(); log('Hệ thống khởi động');
+</script>
 </body>
 </html>
