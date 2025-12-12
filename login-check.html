@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <title>Đăng nhập hệ thống CAFREE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+        .login-container {
+            width: 350px;
+            margin: 100px auto;
+            padding: 20px 25px 30px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin: 8px 0 4px;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background: #007bff;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            background: #0056b3;
+        }
+        .error {
+            background: #ffe6e6;
+            color: #cc0000;
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border: 1px solid #cc0000;
+            font-size: 14px;
+            display: none; /* ban đầu ẩn */
+        }
+        .locked {
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container" id="login-box">
+        <h2>Đăng nhập</h2>
+
+        <!-- Thông báo lỗi (US04) -->
+        <div id="error-box" class="error"></div>
+
+        <!-- Form đăng nhập -->
+        <form id="login-form">
+            <label for="username">Tài khoản</label>
+            <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Nhập tài khoản"
+            />
+
+            <label for="password">Mật khẩu</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Nhập mật khẩu"
+            />
+
+            <button type="submit" id="login-btn">Đăng nhập</button>
+        </form>
+    </div>
+
+    <script>
+        // DANH SÁCH TÀI KHOẢN (demo)
+        const ACCOUNTS = [
+            { username: "nhanvien1", password: "123456" },
+            { username: "nhanvien2", password: "abc123" },
+            { username: "admin",     password: "admin"  }
+        ];
+
+        const MAX_FAILED = 4;
+        let failedAttempts = 0; // đếm số lần nhập sai
+
+        const form      = document.getElementById("login-form");
+        const errorBox  = document.getElementById("error-box");
+        const loginBtn  = document.getElementById("login-btn");
+        const loginBox  = document.getElementById("login-box");
+        const usernameI = document.getElementById("username");
+        const passwordI = document.getElementById("password");
+
+        function showError(message) {
+            errorBox.textContent = message;
+            errorBox.style.display = "block";
+        }
+
+        function clearError() {
+            errorBox.textContent = "";
+            errorBox.style.display = "none";
+        }
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // chặn submit thật, xử lý bằng JS
+
+            const username = usernameI.value.trim();
+            const password = passwordI.value.trim();
+
+            // 1. Kiểm tra rỗng
+            if (!username || !password) {
+                showError("Tài khoản và mật khẩu không được để trống.");
+                return;
+            }
+
+            // 2. Kiểm tra đã bị khoá chưa
+            if (failedAttempts >= MAX_FAILED) {
+                showError("Bạn đã nhập sai quá 4 lần. Đăng nhập bị khóa.");
+                return;
+            }
+
+            // 3. So sánh với DANH SÁCH TÀI KHOẢN
+            const matched = ACCOUNTS.find(
+                acc => acc.username === username && acc.password === password
+            );
+
+            if (matched) {
+                // Đúng → reset lỗi, chuyển vào hệ thống
+                clearError();
+                // Ở đây tạm thời chuyển sang home.html
+                window.location.href = "home.html";
+            } else {
+                // Sai → tăng số lần sai
+                failedAttempts++;
+
+                if (failedAttempts >= MAX_FAILED) {
+                    showError("Bạn đã nhập sai quá 4 lần. Đăng nhập bị khóa.");
+                    // Khoá luôn form
+                    loginBtn.disabled = true;
+                    usernameI.disabled = true;
+                    passwordI.disabled = true;
+                    loginBox.classList.add("locked");
+                } else {
+                    const remain = MAX_FAILED - failedAttempts;
+                    showError("Sai tài khoản hoặc mật khẩu. Bạn còn " + remain + " lần thử.");
+                }
+            }
+        });
+    </script>
+</body>
+</html>
