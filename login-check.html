@@ -45,15 +45,48 @@
         button[type="submit"]:hover {
             background: #0056b3;
         }
-        .error {
-            background: #ffe6e6;
-            color: #cc0000;
-            padding: 8px 10px;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            border: 1px solid #cc0000;
+
+        /* ===== POPUP THÔNG BÁO LỖI ===== */
+        .modal-overlay {
+            display: none;              /* ban đầu ẩn */
+            position: fixed;
+            z-index: 9999;
+            inset: 0;                   /* top:0; right:0; bottom:0; left:0 */
+            background: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-box {
+            background: #fff;
+            width: 80%;
+            max-width: 340px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.25);
+            text-align: center;
+            padding: 15px 20px 10px;
+        }
+        .modal-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .modal-message {
             font-size: 14px;
-            display: none; /* ban đầu ẩn */
+            margin-bottom: 16px;
+        }
+        .modal-footer {
+            border-top: 1px solid #ddd;
+            padding-top: 8px;
+        }
+        .modal-btn {
+            border: none;
+            background: none;
+            color: #007aff;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 6px 0;
+            width: 100%;
+            cursor: pointer;
         }
         .locked {
             opacity: 0.7;
@@ -64,10 +97,6 @@
     <div class="login-container" id="login-box">
         <h2>Đăng nhập</h2>
 
-        <!-- Thông báo lỗi (US04) -->
-        <div id="error-box" class="error"></div>
-
-        <!-- Form đăng nhập -->
         <form id="login-form">
             <label for="username">Tài khoản</label>
             <input
@@ -89,8 +118,21 @@
         </form>
     </div>
 
+    <!-- ===== POPUP THÔNG BÁO LỖI ===== -->
+    <div id="error-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-title">Lỗi đăng nhập</div>
+            <div id="error-modal-message" class="modal-message">
+                <!-- nội dung lỗi sẽ được JS ghi vào -->
+            </div>
+            <div class="modal-footer">
+                <button id="error-modal-ok" class="modal-btn">OK</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // DANH SÁCH TÀI KHOẢN (demo)
+        // ==== DANH SÁCH TÀI KHOẢN DEMO ====
         const ACCOUNTS = [
             { username: "nhanvien1", password: "123456" },
             { username: "nhanvien2", password: "abc123" },
@@ -98,40 +140,56 @@
         ];
 
         const MAX_FAILED = 4;
-        let failedAttempts = 0; // đếm số lần nhập sai
+        let failedAttempts = 0;
 
         const form      = document.getElementById("login-form");
-        const errorBox  = document.getElementById("error-box");
         const loginBtn  = document.getElementById("login-btn");
         const loginBox  = document.getElementById("login-box");
         const usernameI = document.getElementById("username");
         const passwordI = document.getElementById("password");
 
-        function showError(message) {
-            errorBox.textContent = message;
-            errorBox.style.display = "block";
+        // phần popup
+        const modal        = document.getElementById("error-modal");
+        const modalMessage = document.getElementById("error-modal-message");
+        const modalOkBtn   = document.getElementById("error-modal-ok");
+
+        function showErrorPopup(message) {
+            modalMessage.textContent = message;
+            modal.style.display = "flex";    // hiện popup
         }
 
-        function clearError() {
-            errorBox.textContent = "";
-            errorBox.style.display = "none";
+        function hideErrorPopup() {
+            modal.style.display = "none";    // ẩn popup
         }
 
+        // bấm nút OK để tắt popup
+        modalOkBtn.addEventListener("click", function () {
+            hideErrorPopup();
+        });
+
+        // bấm ra ngoài vùng trắng cũng tắt (tuỳ, có thể bỏ)
+        modal.addEventListener("click", function (e) {
+            if (e.target === modal) {
+                hideErrorPopup();
+            }
+        });
+
+        // ==== XỬ LÝ ĐĂNG NHẬP ====
         form.addEventListener("submit", function (event) {
-            event.preventDefault(); // chặn submit thật, xử lý bằng JS
+            event.preventDefault();
 
             const username = usernameI.value.trim();
             const password = passwordI.value.trim();
 
             // 1. Kiểm tra rỗng
             if (!username || !password) {
-                showError("Tài khoản và mật khẩu không được để trống.");
+                showErrorPopup("Tài khoản và mật khẩu không được để trống. Vui lòng nhập lại.");
                 return;
             }
 
             // 2. Kiểm tra đã bị khoá chưa
             if (failedAttempts >= MAX_FAILED) {
-                showError("Bạn đã nhập sai quá 4 lần. Đăng nhập bị khóa.");
+                showErrorPopup("Bạn đã nhập sai quá 4 lần. Đăng nhập bị khóa.");
                 return;
             }
 
@@ -141,24 +199,23 @@
             );
 
             if (matched) {
-                // Đúng → reset lỗi, chuyển vào hệ thống
-                clearError();
-                // Ở đây tạm thời chuyển sang home.html
-                window.location.href = "home.html";
+                // Đăng nhập đúng
+                window.location.href = "home.html"; // hoặc trang khác trong hệ thống
             } else {
                 // Sai → tăng số lần sai
                 failedAttempts++;
 
                 if (failedAttempts >= MAX_FAILED) {
-                    showError("Bạn đã nhập sai quá 4 lần. Đăng nhập bị khóa.");
-                    // Khoá luôn form
+                    showErrorPopup("Bạn đã nhập sai quá 4 lần. Đăng nhập bị khóa.");
                     loginBtn.disabled = true;
                     usernameI.disabled = true;
                     passwordI.disabled = true;
                     loginBox.classList.add("locked");
                 } else {
                     const remain = MAX_FAILED - failedAttempts;
-                    showError("Sai tài khoản hoặc mật khẩu. Bạn còn " + remain + " lần thử.");
+                    showErrorPopup(
+                        "Sai tài khoản hoặc mật khẩu. Bạn còn " + remain + " lần thử. Vui lòng đăng nhập lại."
+                    );
                 }
             }
         });
