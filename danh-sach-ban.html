@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách bàn - Cafe</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .table-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .table-card {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .table-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+        }
+
+        .table-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .table-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            color: #fff;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 14px;
+        }
+
+        .status-free {
+            background-color: #4CAF50; /* xanh lá: trống */
+        }
+
+        .status-occupied {
+            background-color: #F44336; /* đỏ: đang phục vụ */
+        }
+
+        .status-reserved {
+            background-color: #FF9800; /* cam: đặt trước */
+        }
+
+        @media (max-width: 600px) {
+            .table-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Danh sách bàn</h1>
+    <div class="table-grid">
+        <div class="table-card">
+            <div class="table-number">Bàn 1</div>
+            <div class="table-status status-free">Trống</div>
+        </div>
+        <div class="table-card">
+            <div class="table-number">Bàn 2</div>
+            <div class="table-status status-occupied">Đang phục vụ</div>
+        </div>
+        <div class="table-card">
+            <div class="table-number">Bàn 3</div>
+            <div class="table-status status-reserved">Đặt trước</div>
+        </div>
+        <div class="table-card">
+            <div class="table-number">Bàn 4</div>
+            <div class="table-status status-free">Trống</div>
+        </div>
+        <div class="table-card">
+            <div class="table-number">Bàn 5</div>
+            <div class="table-status status-occupied">Đang phục vụ</div>
+        </div>
+        <div class="table-card">
+            <div class="table-number">Bàn 6</div>
+            <div class="table-status status-free">Trống</div>
+        </div>
+    </div>
+</body>
+</html>
