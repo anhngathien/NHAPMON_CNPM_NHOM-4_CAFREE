@@ -3,127 +3,440 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Danh sách bàn - Cafe</title>
+<title>Quản lý Bàn Quán Cafe</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
-    /* Font & Background */
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
-        margin: 0;
-        padding: 30px 20px;
-    }
+/* ====== Cơ bản ====== */
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    background: linear-gradient(120deg, #fefefe, #e6e9f0);
+}
 
-    h1 {
-        text-align: center;
-        color: #333;
-        margin-bottom: 40px;
-        font-size: 32px;
-    }
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-    /* Grid bàn */
-    .table-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 25px;
-        max-width: 1000px;
-        margin: 0 auto;
-    }
+/* ====== Header ====== */
+.header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
 
-    /* Card bàn */
-    .table-card {
-        background-color: #ffffff;
-        border-radius: 15px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-        cursor: pointer;
-        transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
-        border: 2px solid transparent;
-    }
+.search-bar {
+    display: flex;
+    flex: 1;
+    max-width: 400px;
+    margin-right: 20px;
+}
 
-    .table-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-        border: 2px solid #6c63ff;
-    }
+.search-bar input {
+    flex: 1;
+    padding: 10px 15px;
+    border-radius: 25px 0 0 25px;
+    border: 1px solid #ccc;
+    outline: none;
+}
 
-    .table-number {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 10px;
-        color: #222;
-    }
+.search-bar button {
+    padding: 10px 15px;
+    border-radius: 0 25px 25px 0;
+    border: 1px solid #ccc;
+    background-color: #6c63ff;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+}
 
-    .table-seats {
-        font-size: 14px;
-        color: #555;
-        margin-bottom: 12px;
-    }
+.search-bar button:hover {
+    background-color: #5548c8;
+}
 
-    .table-status {
-        padding: 6px 14px;
-        border-radius: 25px;
-        color: #fff;
-        font-weight: bold;
-        display: inline-block;
-        font-size: 14px;
-        transition: background 0.3s ease;
-    }
+.table-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
 
-    /* Trạng thái bàn */
-    .status-free {
-        background-color: #4CAF50; /* xanh pastel */
-    }
+.filter-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 25px;
+    background-color: #d1d5f0;
+    color: #333;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.3s;
+}
 
-    .status-occupied {
-        background-color: #F06292; /* đỏ nhạt */
-    }
+.filter-btn.active, .filter-btn:hover {
+    background-color: #6c63ff;
+    color: #fff;
+}
 
-    .status-reserved {
-        background-color: #FFB74D; /* cam nhạt */
-    }
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
 
-    /* Responsive */
-    @media (max-width: 600px) {
-        .table-grid {
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        }
-    }
+.notification {
+    position: relative;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.notification .badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: #ff4d4f;
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 50%;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-info img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+
+/* ====== Main Content ====== */
+.main-content {
+    display: flex;
+    gap: 20px;
+}
+
+/* ====== Bảng bàn ====== */
+.tables-section {
+    flex: 1;
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.status-indicators {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status-badge.empty { background-color: #4CAF50; }
+.status-badge.reserved { background-color: #FF9800; }
+.status-badge.full { background-color: #F44336; }
+
+/* Danh sách bàn */
+.tables-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+}
+
+/* Card bàn */
+.table-card {
+    position: relative;
+    border-radius: 20px;
+    padding: 15px;
+    background: linear-gradient(135deg, #ffffff, #f0f1f5);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.table-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+}
+
+/* Trạng thái bàn */
+.table-card.empty { border-left: 6px solid #4CAF50; }
+.table-card.reserved { border-left: 6px solid #FF9800; }
+.table-card.full { border-left: 6px solid #F44336; }
+
+.table-id {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+}
+
+.table-info {
+    margin: 10px 0;
+}
+
+.table-name {
+    font-weight: 500;
+    color: #555;
+}
+
+.table-capacity {
+    font-size: 13px;
+    color: #888;
+}
+
+.table-status {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 20px;
+    width: fit-content;
+}
+
+.table-card.empty .table-status { background-color: #4CAF50; }
+.table-card.reserved .table-status { background-color: #FF9800; }
+.table-card.full .table-status { background-color: #F44336; }
+
+.table-card button {
+    margin-top: 10px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.btn-reserve { background-color: #6c63ff; color: #fff; }
+.btn-reserve:hover { background-color: #5548c8; }
+
+.btn-cancel { background-color: #ff6b6b; color: #fff; }
+.btn-cancel:hover { background-color: #d64545; }
+
+.btn-full { background-color: #ccc; color: #fff; cursor: not-allowed; }
+
+/* ====== Hóa đơn ====== */
+.bill-section {
+    flex: 0.5;
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    max-height: 700px;
+}
+
+.bill-header h3 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+}
+
+.menu-items {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f7f7f7;
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.item-name { font-weight: 500; }
+.item-price, .item-total { font-weight: 600; }
+
+.qty-btn {
+    padding: 4px 8px;
+    border: none;
+    background: #6c63ff;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.qty-btn:hover { background: #5548c8; }
+
+.delete-item {
+    background: none;
+    border: none;
+    color: #ff4d4f;
+    cursor: pointer;
+}
+
+/* Tổng kết hóa đơn */
+.bill-summary {
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 5px 0;
+}
+
+.total-row { font-size: 18px; font-weight: 700; }
+.highlight { color: #6c63ff; }
+
+/* Nút thanh toán */
+.bill-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-action {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    transition: 0.3s;
+}
+
+.btn-action.pay { background-color: #4CAF50; }
+.btn-action.pay:hover { background-color: #3e8e41; }
+
+.btn-action.checkout { background-color: #6c63ff; }
+.btn-action.checkout:hover { background-color: #5548c8; }
+
+/* Scrollbar */
+.menu-items::-webkit-scrollbar {
+    width: 6px;
+}
+.menu-items::-webkit-scrollbar-thumb {
+    background: #6c63ff;
+    border-radius: 3px;
+}
+.menu-items::-webkit-scrollbar-track {
+    background: #f0f0f0;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .main-content { flex-direction: column; }
+    .bill-section { max-height: none; margin-top: 20px; }
+}
 </style>
 </head>
 <body>
-<h1>Danh sách bàn</h1>
-<div class="table-grid">
-    <div class="table-card">
-        <div class="table-number">Bàn 1</div>
-        <div class="table-seats">4 ghế</div>
-        <div class="table-status status-free">Trống</div>
-    </div>
-    <div class="table-card">
-        <div class="table-number">Bàn 2</div>
-        <div class="table-seats">2 ghế</div>
-        <div class="table-status status-occupied">Đang phục vụ</div>
-    </div>
-    <div class="table-card">
-        <div class="table-number">Bàn 3</div>
-        <div class="table-seats">6 ghế</div>
-        <div class="table-status status-reserved">Đặt trước</div>
-    </div>
-    <div class="table-card">
-        <div class="table-number">Bàn 4</div>
-        <div class="table-seats">4 ghế</div>
-        <div class="table-status status-free">Trống</div>
-    </div>
-    <div class="table-card">
-        <div class="table-number">Bàn 5</div>
-        <div class="table-seats">2 ghế</div>
-        <div class="table-status status-occupied">Đang phục vụ</div>
-    </div>
-    <div class="table-card">
-        <div class="table-number">Bàn 6</div>
-        <div class="table-seats">4 ghế</div>
-        <div class="table-status status-free">Trống</div>
-    </div>
+<div class="container">
+    <!-- Header -->
+    <header class="header">
+        <div class="search-bar">
+            <input type="text" placeholder="🔍 Tìm bàn hoặc món..." id="searchInput">
+            <button id="btnSearch"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="table-filters">
+            <button class="filter-btn active">VIP</button>
+            <button class="filter-btn">A</button>
+            <button class="filter-btn">B</button>
+            <button class="filter-btn">C</button>
+            <button class="filter-btn">D</button>
+        </div>
+        <div class="header-actions">
+            <div class="notification"><i class="fas fa-bell"></i><span class="badge">3</span></div>
+            <div class="user-info"><img src="https://via.placeholder.com/40" alt="User"><span>Quản lý</span></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Left: Bàn -->
+        <div class="tables-section">
+            <div class="section-header">
+                <div class="title">SỐ LƯỢNG KHÁCH NGỒI (3)</div>
+                <div class="status-indicators">
+                    <span class="status-badge empty">Bàn trống</span>
+                    <span class="status-badge reserved">Đặt trước</span>
+                    <span class="status-badge full">Hết chỗ</span>
+                </div>
+            </div>
+            <div class="tables-container">
+                <div class="table-card empty">
+                    <div class="table-id">BÀN 1</div>
+                    <div class="table-info"><div class="table-name">VIP 1</div><div class="table-capacity">5/10</div></div>
+                    <div class="table-status">TRỐNG</div>
+                    <button class="btn-reserve"><i class="fas fa-plus"></i> Đặt chỗ</button>
+                </div>
+                <div class="table-card reserved">
+                    <div class="table-id">BÀN 2</div>
+                    <div class="table-info"><div class="table-name">A</div><div class="table-capacity">2/4</div></div>
+                    <div class="table-status">ĐẶT TRƯỚC</div>
+                    <button class="btn-cancel"><i class="fas fa-times"></i> Hủy</button>
+                </div>
+                <div class="table-card full">
+                    <div class="table-id">BÀN 3</div>
+                    <div class="table-info"><div class="table-name">B</div><div class="table-capacity">4/4</div></div>
+                    <div class="table-status">HẾT CHỖ</div>
+                    <button class="btn-full"><i class="fas fa-lock"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Hóa đơn -->
+        <div class="bill-section">
+            <div class="bill-header">
+                <h3>THỰC ĐƠN <span>VIP 1</span></h3>
+                <div class="bill-status">Tất cả</div>
+            </div>
+            <div class="menu-items" id="menuItems">
+                <div class="menu-item">
+                    <div class="item-info"><div class="item-name">CUBA LIBRE</div><div class="item-price">25,000</div></div>
+                    <div class="item-quantity"><button class="qty-btn minus">-</button><input type="number" value="2" min="1"><button class="qty-btn plus">+</button></div>
+                    <div class="item-total">50,000</div>
+                    <button class="delete-item"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            <div class="bill-summary">
+                <div class="summary-row"><span>Tổng thành tiền</span><span class="total-price">50,000</span></div>
+                <div class="summary-row"><span>Chiết khấu</span><span>0</span></div>
+                <div class="summary-row vat-row"><span>VAT 10%</span><span>5,000</span></div>
+                <div class="summary-row total-row"><strong>Tổng cộng</strong><strong class="highlight">55,000</strong></div>
+            </div>
+            <div class="bill-actions">
+                <button class="btn-action pay"><i class="fas fa-money-bill-wave"></i> Tiền khách trả</button>
+                <button class="btn-action checkout"><i class="fas fa-cash-register"></i> Thanh toán [F4]</button>
+            </div>
+        </div>
+    </main>
 </div>
 </body>
 </html>
