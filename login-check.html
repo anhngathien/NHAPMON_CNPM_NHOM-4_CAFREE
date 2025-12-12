@@ -1,0 +1,45 @@
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+# Danh sách tài khoản mẫu
+accounts = [
+    {"username": "admin", "password": "123"},
+    {"username": "user1", "password": "abc"},
+]
+
+# Biến đếm số lần sai
+login_fail_count = {}
+
+@app.route('/login', methods=['POST'])
+def login():
+    global login_fail_count
+
+    data = request.json or {}
+    username = (data.get("username") or "").strip()
+    password = (data.get("password") or "").strip()
+
+    # Kiểm tra rỗng
+    if username == "" or password == "":
+        return jsonify({"success": False, "message": "Không được để trống user/pass"}), 400
+
+    # Kiểm tra bị khóa
+    if login_fail_count.get(username, 0) >= 4:
+        return jsonify({"success": False, "message": "Tài khoản đã bị khóa"}), 403
+
+    # So sánh với danh sách tài khoản
+    matched = next((acc for acc in accounts if acc["username"] == username and acc["password"] == password), None)
+
+    if not matched:
+        # tăng số lần sai
+        login_fail_count[username] = login_fail_count.get(username, 0) + 1
+        if login_fail_count[username] >= 4:
+            return jsonify({"success": False, "message": "Sai 4 lần - tài khoản bị khóa"}), 403
+        return jsonify({"success": False, "message": f"Sai user/pass. Lần sai: {login_fail_count[username]}"}), 401
+
+    # Nếu đúng
+    login_fail_count[username] = 0
+    return jsonify({"success": True, "message": "Đăng nhập thành công"})
+
+if __name__ == '__main__':
+    app.run(debug=True)
