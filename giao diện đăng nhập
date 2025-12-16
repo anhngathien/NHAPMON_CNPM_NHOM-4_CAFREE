@@ -8,7 +8,7 @@
     <style>
         body {
             margin: 0;
-            font-family: "Poppins", sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #6a11cb, #2575fc);
             height: 100vh;
             display: flex;
@@ -18,48 +18,43 @@
 
         .login-box {
             width: 360px;
-            background: #ffffffee;
+            background: white;
             padding: 40px;
-            border-radius: 22px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
         }
 
         h2 {
             text-align: center;
             margin-bottom: 25px;
-            color: #333;
-        }
-
-        .input-group {
-            margin-bottom: 18px;
         }
 
         input {
             width: 100%;
             padding: 12px;
-            border-radius: 14px;
-            border: 2px solid #ddd;
-            font-size: 15px;
-            outline: none;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border: 1px solid #ccc;
+            font-size: 14px;
         }
 
-        .btn-login {
+        button {
             width: 100%;
             padding: 12px;
             background: #6a11cb;
-            border: none;
             color: white;
-            border-radius: 14px;
+            border: none;
+            border-radius: 12px;
             font-size: 16px;
             cursor: pointer;
         }
 
-        .error-text {
+        .error {
             margin-top: 12px;
             color: red;
-            font-size: 13px;
             text-align: center;
             display: none;
+            font-size: 13px;
         }
     </style>
 </head>
@@ -68,42 +63,27 @@
 <div class="login-box">
     <h2>Đăng nhập CAFREE</h2>
 
-    <div class="input-group">
-        <input type="text" id="username" placeholder="Tên đăng nhập">
-    </div>
+    <input type="text" id="username" placeholder="Tên đăng nhập">
+    <input type="password" id="password" placeholder="Mật khẩu">
 
-    <div class="input-group">
-        <input type="password" id="password" placeholder="Mật khẩu">
-    </div>
+    <button onclick="login()">Đăng nhập</button>
 
-    <button class="btn-login" onclick="login()">Đăng nhập</button>
-
-    <p class="error-text" id="errorMsg"></p>
+    <div class="error" id="errorMsg"></div>
 </div>
 
 <script>
     function login() {
-        const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const errorMsg = document.getElementById("errorMsg");
+        const user = document.getElementById("username").value.trim();
+        const pass = document.getElementById("password").value.trim();
+        const error = document.getElementById("errorMsg");
 
-        // Tài khoản cố định
-        const FIXED_USER = "admin";
-        const FIXED_PASS = "123456";
-
-        // Không cho rỗng
-        if (username === "" || password === "") {
-            errorMsg.style.display = "block";
-            errorMsg.innerText = "Vui lòng nhập đầy đủ tài khoản và mật khẩu";
-            return;
-        }
-
-        // Kiểm tra đăng nhập
-        if (username === FIXED_USER && password === FIXED_PASS) {
-            window.location.href = "danh-sach-ban.html";
+        // tài khoản cố định
+        if (user === "admin" && pass === "123456") {
+            // 👉 CHUYỂN SANG US06
+            window.location.href = "us06-them-mon-moi.html";
         } else {
-            errorMsg.style.display = "block";
-            errorMsg.innerText = "Sai tên đăng nhập hoặc mật khẩu";
+            error.style.display = "block";
+            error.innerText = "Sai tên đăng nhập hoặc mật khẩu";
         }
     }
 </script>
