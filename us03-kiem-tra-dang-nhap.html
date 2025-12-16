@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>US03 - Đăng nhập hệ thống</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-card {
+      background: #fff;
+      width: 360px;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-card h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .form-group input:focus {
+      border-color: #4facfe;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: #4facfe;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #2f8bfd;
+    }
+
+    .message {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #e74c3c;
+    }
+
+    .success {
+      color: #2ecc71;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 12px;
+      color: #888;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="login-card">
+  <h2>Đăng nhập hệ thống</h2>
+
+  <div class="form-group">
+    <label>Tên đăng nhập</label>
+    <input type="text" id="username" placeholder="Nhập username">
+  </div>
+
+  <div class="form-group">
+    <label>Mật khẩu</label>
+    <input type="password" id="password" placeholder="Nhập mật khẩu">
+  </div>
+
+  <button onclick="login()">Đăng nhập</button>
+
+  <div id="message" class="message"></div>
+
+
+</div>
+
+<script>
+  let failedCount = 0;
+
+  const accounts = [
+    { username: "admin", password: "123" },
+    { username: "staff", password: "456" }
+  ];
+
+  function login() {
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    const msg = document.getElementById("message");
+
+    msg.className = "message";
+    msg.innerText = "";
+
+    if (!user || !pass) {
+      msg.classList.add("error");
+      msg.innerText = "Không được để trống tài khoản hoặc mật khẩu";
+      return;
+    }
+
+    const found = accounts.find(
+      acc => acc.username === user && acc.password === pass
+    );
+
+    if (!found) {
+      failedCount++;
+      msg.classList.add("error");
+
+      if (failedCount >= 4) {
+        msg.innerText = "Tài khoản đã bị khóa do đăng nhập sai quá 4 lần";
+      } else {
+        msg.innerText = "Sai tài khoản hoặc mật khẩu";
+      }
+      return;
+    }
+
+    failedCount = 0;
+    msg.classList.add("success");
+    msg.innerText = "Đăng nhập thành công – chuyển vào hệ thống";
+  }
+</script>
+
+</body>
+</html>
