@@ -259,7 +259,17 @@
     .muted{color:var(--muted);font-size:13px}
   </style>
 </head>
+<script src="scripts.js"></script>
+</body>
+</html>
 <body>
+  <div style="display:flex; gap:10px; margin-bottom:14px">
+    <button class="action-btn" onclick="go('us06-them-mon-moi.html')">➕ Thêm món</button>
+    <button class="action-btn" onclick="go('us08-sua-mon.html')">✏️ Sửa món</button>
+    <button class="action-btn" onclick="go('us07-xoa-mon.html')">🗑️ Xoá món</button>
+    <button class="action-btn logout" onclick="logout()">🚪 Đăng xuất</button>
+  </div>
+
   <div class="app">
     <aside class="left">
       <div class="brand">
