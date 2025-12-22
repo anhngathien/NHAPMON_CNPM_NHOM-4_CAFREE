@@ -257,13 +257,41 @@ function applyAuth(){
   renderCart();
 }
 
-q('#payBtn').onclick = ()=>{
-  if(state.cart.length===0){ alert('Hóa đơn rỗng'); return; }
-  const total = state.cart.reduce((s,i)=>s+i.price*i.qty,0);
-  if(!state.user){ if(!confirm('Bạn chưa đăng nhập. Tiếp tục thanh toán như khách?')) return; }
-  alert(`Thanh toán thành công — Tổng: ${money(total)}`);
-  log(`Thanh toán: ${money(total)} bởi ${state.user || 'Khách'}`);
-  state.cart = []; renderCart();
+q('#payBtn').onclick = ()=>{q('#payBtn').onclick = ()=>{
+  // ❌ Không cho thanh toán nếu hóa đơn rỗng
+  if(state.cart.length === 0){
+    alert('⚠️ Hóa đơn rỗng');
+    return;
+  }
+
+  // ✅ Tính tổng tiền từ dữ liệu thật
+  const total = state.cart.reduce((s,i)=>s + i.price*i.qty, 0);
+
+  // ✅ TẠO MÃ HÓA ĐƠN DUY NHẤT
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2,'0');
+  const dd = String(now.getDate()).padStart(2,'0');
+
+  let count = localStorage.getItem("soHoaDon") || 0;
+  count++;
+  localStorage.setItem("soHoaDon", count);
+
+  const maHD = `HD${yyyy}${mm}${dd}-${String(count).padStart(3,'0')}`;
+
+  // ✅ HIỂN THỊ HÓA ĐƠN
+  alert(
+    "✅ THANH TOÁN THÀNH CÔNG\n\n" +
+    "Mã hóa đơn: " + maHD + "\n" +
+    "Tổng tiền: " + money(total)
+  );
+
+  // ✅ LOG + RESET HÓA ĐƠN
+  log(`Thanh toán ${maHD} — ${money(total)} — ${state.user || 'Khách'}`);
+  state.cart = [];
+  renderCart();
+}
+
 }
 
 // Search / filter
