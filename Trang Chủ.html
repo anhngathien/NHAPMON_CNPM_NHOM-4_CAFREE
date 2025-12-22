@@ -54,16 +54,35 @@ body{
     overflow-y:auto;
     background: #f4f7f6;
 }
-.menu-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:16px;
+/* --- SỬA LẠI THANH MENU HEADER CHO ĐẸP --- */
+.menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    /* Cố định thanh này khi cuộn chuột */
     position: sticky;
     top: 0;
-    background: #f4f7f6;
     z-index: 10;
-    padding-bottom: 10px;
+
+    /* 👇 GIAO DIỆN MỚI 👇 */
+    background-color: #ffffff; /* Nền trắng sạch sẽ */
+    padding: 15px 20px;        /* Tăng khoảng cách cho thoáng */
+    margin: -20px -20px 20px -20px; /* Căn chỉnh để thanh này tràn ra sát mép */
+    
+    /* Hiệu ứng bóng mờ đổ xuống dưới giúp thanh nổi bật */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+    border-bottom: 1px solid #eee;
+}
+
+/* Chỉnh chữ "Menu" to và đẹp hơn */
+.menu-header h3 {
+    margin: 0;
+    color: #6a11cb; /* Màu tím trùng với Sidebar */
+    font-size: 24px;
+    font-weight: 800;
+    text-transform: uppercase; /* Chữ in hoa */
+    letter-spacing: 1px;
 }
 
 /* Table Bar */
@@ -275,6 +294,109 @@ body{
         </div>
 
         <div class="menu-grid">
+            <div class="card" onclick="addItem('Trà sữa xoài', 35000)">
+    <img src="images/tra-sua-xoai.jpg" alt="Trà sữa xoài" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Trà sữa xoài</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
+
+<div class="card" onclick="addItem('Trà sữa matcha', 35000)">
+    <img src="images/tra-sua-matcha.jpg" alt="Trà sữa matcha" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Trà sữa matcha</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
+
+<div class="card" onclick="addItem('Sữa tươi đường nâu', 35000)">
+    <img src="images/sua-tuoi-duong-nau.jpg" alt="Sữa tươi đường nâu" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Sữa tươi đường nâu</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
+
+<div class="card" onclick="addItem('Trà sữa đào', 35000)">
+    <img src="images/tra-sua-dao.jpg" alt="Trà sữa đào" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Trà sữa đào</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
+
+<div class="card" onclick="addItem('Trà sữa thạch', 35000)">
+    <img src="images/tra-sua-thach.jpg" alt="Trà sữa thạch" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Trà sữa thạch</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
+
+<div class="card" onclick="addItem('Tào phớ trà xanh', 35000)">
+    <img src="images/tao-pho-tra-xanh.jpg" alt="Tào phớ trà xanh" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Tào phớ trà xanh</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
+
+<div class="card" onclick="addItem('Trà sữa kem cheese', 35000)">
+    <img src="images/tra-sua-kem-cheese.jpg" alt="Trà sữa kem cheese" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Trà sữa kem cheese</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
+
+<div class="card" onclick="addItem('Trà xanh', 35000)">
+    <img src="images/tra-xanh.jpg" alt="Trà xanh" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Trà xanh</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
+
+<div class="card" onclick="addItem('Smoothie dâu', 35000)">
+    <img src="images/smoothie-dau.jpg" alt="Smoothie dâu" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Smoothie dâu</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
+
+<div class="card" onclick="addItem('Trà sữa đậu đỏ', 35000)">
+    <img src="images/tra-sua-dau-do.jpg" alt="Trà sữa đậu đỏ" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Trà sữa đậu đỏ</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
+
+<div class="card" onclick="addItem('Trà ô long', 35000)">
+    <img src="images/tra-o-long.jpg" alt="Trà ô long" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Trà ô long</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
+
+<div class="card" onclick="addItem('Trà sữa oreo', 35000)">
+    <img src="images/tra-sua-oreo.jpg" alt="Trà sữa oreo" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Trà sữa oreo</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
+
+<div class="card" onclick="addItem('Trà hoa nhài', 35000)">
+    <img src="images/tra-hoa-nhai.jpg" alt="Trà hoa nhài" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
+    <div class="card-body">
+        <b>Trà hoa nhài</b>
+        <div class="price">35.000 đ</div>
+    </div>
+</div>
             <div class="card" onclick="addItem('Cà phê đen',25000)">
                 <img src="images/cafe-den.jpg" alt="Cà phê đen">
                 <div class="card-body"><b>Cà phê đen</b><div class="price">25.000 đ</div></div>
