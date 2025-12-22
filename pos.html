@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>CAFREE | Bán Hàng Tại Quầy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css"> 
+<script src="scripts.js"></script>
+
+<style>
+/* CSS RIÊNG CHO TRANG POS */
+*{box-sizing:border-box}
+body{
+    margin:0;
+    font-family: Arial, sans-serif; 
+    background:#f3f4f6;
+    overflow: hidden; 
+}
+.pos-container{
+    display:grid;
+    grid-template-columns:240px 1fr 360px;
+    height:100vh;
+}
+
+/* 1. SIDEBAR */
+.sidebar{
+    background:linear-gradient(180deg,#6a11cb,#2575fc);
+    color:white;
+    padding:20px;
+    display: flex;
+    flex-direction: column;
+}
+.sidebar h2{text-align:center;margin-bottom:30px}
+.sidebar button{
+    width:100%;
+    padding:12px;
+    margin-bottom:12px;
+    border:none;
+    border-radius:14px;
+    background:rgba(255,255,255,0.2);
+    color:white;
+    cursor:pointer;
+    text-align: left;
+    font-size: 16px;
+    transition: 0.3s;
+}
+.sidebar button:hover { background:rgba(255,255,255,0.4); }
+.sidebar button i { margin-right: 10px; width: 20px;}
+
+/* 2. MENU AREA */
+.menu-area{
+    padding:20px;
+    overflow-y:auto;
+    background: #f4f7f6;
+}
+.menu-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:16px;
+    position: sticky;
+    top: 0;
+    background: #f4f7f6;
+    z-index: 10;
+    padding-bottom: 10px;
+}
+
+/* Table Bar */
+.table-bar{ display:flex; gap:10px; flex-wrap: wrap;}
+.table-bar button{
+    padding:10px 16px;
+    border:none;
+    border-radius:16px;
+    background:#e5e7eb;
+    font-weight:bold;
+    cursor:pointer;
+    transition: 0.2s;
+}
+.table-bar button:hover { background: #d1d5db; }
+.table-bar button.active{
+    background:#6a11cb;
+    color:white;
+    box-shadow: 0 4px 10px rgba(106, 17, 203, 0.4);
+}
+.table-bar button.has-order {
+    border: 2px solid #27ae60;
+    color: #27ae60;
+}
+.table-bar button.active.has-order {
+    border: 2px solid white;
+    color: white;
+}
+
+/* Grid Món Ăn */
+.menu-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:16px;
+}
+.card{
+    background:white;
+    border-radius:18px;
+    box-shadow:0 4px 10px rgba(0,0,0,.05);
+    overflow:hidden;
+    cursor:pointer;
+    transition:.3s;
+    border: 1px solid transparent;
+}
+.card:hover{transform:translateY(-5px); border-color: #6a11cb;}
+.card img{width:100%;height:120px; object-fit: cover;}
+.card-body{padding:10px}
+.price{color:#6a11cb;font-weight:bold; margin-top: 5px;}
+
+/* 3. ORDER AREA */
+.order-area{
+    background:white;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    border-left: 1px solid #ddd;
+}
+.order-header { text-align: center; border-bottom: 2px dashed #eee; padding-bottom: 15px;}
+.order-list{flex:1;overflow-y:auto; padding-top: 10px;}
+.order-item{
+    display:flex;
+    justify-content:space-between;
+    align-items: center;
+    margin-bottom:12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.qty-control{
+    display:flex;
+    align-items: center;
+    gap:8px;
+    margin-top: 4px;
+}
+.qty-btn{
+    width: 24px; height: 24px;
+    border:none; background:#eee;
+    border-radius:50%; cursor:pointer;
+    font-weight: bold;
+}
+.qty-btn:hover { background: #ddd; }
+.remove-btn{color:#e74c3c;cursor:pointer; margin-left: 8px;}
+
+.total-section{
+    border-top: 2px solid #333;
+    padding-top: 15px;
+}
+.total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-bottom: 15px;}
+.btn-pay{
+    width: 100%;
+    padding:16px;
+    border:none;
+    border-radius:12px;
+    background:#27ae60;
+    color:white;
+    font-size:16px;
+    font-weight: bold;
+    cursor:pointer;
+    transition: 0.3s;
+}
+.btn-pay:hover { background: #219150; }
+
+/* Responsive Mobile */
+@media (max-width: 768px) {
+    .pos-container { grid-template-columns: 1fr; height: auto;}
+    .sidebar { display: none; }
+    .order-area { height: 50vh; border-top: 5px solid #eee;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="pos-container">
+
+    <div class="sidebar">
+        <h2><i class="fa-solid fa-mug-hot"></i> CAFREE</h2>
+        <button onclick="go('us06-them-mon-moi.html')"><i class="fa-solid fa-plus"></i> Thêm món</button>
+        <button onclick="go('danh-sach-ban.html')"><i class="fa-solid fa-table"></i> Quản lý bàn</button>
+        <button onclick="go('thong-ke.html')"><i class="fa-solid fa-chart-line"></i> Thống kê</button>
+        <div style="flex:1"></div>
+        <button onclick="logout()" style="background: rgba(231, 76, 60, 0.8);">
+            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+        </button>
+    </div>
+
+    <div class="menu-area">
+        <div class="menu-header">
+            <h3>Menu</h3>
+            <div class="table-bar" id="tableBar">
+                <button onclick="selectTable(this, 'B1')">Bàn 1</button>
+                <button onclick="selectTable(this, 'B2')">Bàn 2</button>
+                <button onclick="selectTable(this, 'B3')">Bàn 3</button>
+                <button onclick="selectTable(this, 'B4')">Bàn 4</button>
+                <button onclick="selectTable(this, 'B5')">Bàn 5</button>
+            </div>
+        </div>
+
+        <div class="menu-grid">
+            <div class="card" onclick="addItem('Cà phê đen',25000)">
+                <img src="images/cafe-den.jpg" alt="Cà phê đen">
+                <div class="card-body"><b>Cà phê đen</b><div class="price">25.000 đ</div></div>
+            </div>
+            <div class="card" onclick="addItem('Cà phê sữa',28000)">
+                <img src="images/cafe-sua.jpg" alt="Cà phê sữa">
+                <div class="card-body"><b>Cà phê sữa</b><div class="price">28.000 đ</div></div>
+            </div>
+            <div class="card" onclick="addItem('Bạc xỉu',30000)">
+                <img src="images/bac-xiu.jpg" alt="Bạc xỉu">
+                <div class="card-body"><b>Bạc xỉu</b><div class="price">30.000 đ</div></div>
+            </div>
+            <div class="card" onclick="addItem('Latte',35000)">
+                <img src="images/latte.jpg" alt="Latte">
+                <div class="card-body"><b>Latte</b><div class="price">35.000 đ</div></div>
+            </div>
+            <div class="card" onclick="addItem('Cappuccino',38000)">
+                <img src="images/cappuccino.jpg" alt="Cappuccino">
+                <div class="card-body"><b>Cappuccino</b><div class="price">38.000 đ</div></div>
+            </div>
+            <div class="card" onclick="addItem('Trà đào',35000)">
+                <img src="images/tra-dao.jpg" alt="Trà đào">
+                <div class="card-body"><b>Trà đào</b><div class="price">35.000 đ</div></div>
+            </div>
+            <div class="card" onclick="addItem('Trà chanh',30000)">
+                <img src="images/tra-chanh.jpg" alt="Trà chanh">
+                <div class="card-body"><b>Trà chanh</b><div class="price">30.000 đ</div></div>
+            </div>
+            <div class="card" onclick="addItem('Trà sữa',40000)">
+                <img src="images/tra-sua.jpg" alt="Trà sữa">
+                <div class="card-body"><b>Trà sữa</b><div class="price">40.000 đ</div></div>
+            </div>
+            <div class="card" onclick="addItem('Trà sữa trân châu',45000)">
+                <img src="images/tra-sua-tran-chau.jpg" alt="Trà sữa trân châu">
+                <div class="card-body"><b>Trà sữa trân châu</b><div class="price">45.000 đ</div></div>
+            </div>
+            <div class="card" onclick="addItem('Sinh tố xoài',45000)">
+                <img src="images/sinh-to-xoai.jpg" alt="Sinh tố xoài">
+                <div class="card-body"><b>Sinh tố xoài</b><div class="price">45.000 đ</div></div>
+            </div>
+            <div class="card" onclick="addItem('Smoothie dâu',45000)">
+                <img src="images/smoothie-dau.jpg" alt="Smoothie dâu">
+                <div class="card-body"><b>Sinh tố dâu</b><div class="price">45.000 đ</div></div>
+            </div>
+            <div class="card" onclick="addItem('Nước cam',35000)">
+                <img src="images/nuoc-ep-cam.jpg" alt="Nước ép cam">
+                <div class="card-body"><b>Nước cam</b><div class="price">35.000 đ</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-area">
+        <div class="order-header">
+            <h3 id="currentTableName">Chọn bàn để gọi món</h3>
+            <small id="orderTime">--:--</small>
+        </div>
+        
+        <div id="orderList" class="order-list">
+            <p style="text-align:center; color:#888; margin-top:50px;">Chưa có món nào</p>
+        </div>
+
+        <div class="total-section">
+            <div class="total-row">
+                <span>Tổng tiền:</span>
+                <span id="totalMoney">0 đ</span>
+            </div>
+            <button class="btn-pay" onclick="pay()">THANH TOÁN</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ============================================
+// LOGIC POS (ĐÃ SỬA LỖI & GIỮ NGUYÊN DANH SÁCH MÓN)
+// ============================================
+
+let tableOrders = {}; 
+let currentTableId = null;
+
+// Hàm chọn bàn
+function selectTable(btn, tableId){
+    document.querySelectorAll(".table-bar button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    currentTableId = tableId;
+    document.getElementById("currentTableName").innerText = "Hóa đơn: " + tableId;
+
+    if (!tableOrders[tableId]) {
+        tableOrders[tableId] = {};
+    }
+
+    renderOrder();
+}
+
+// Hàm thêm món
+function addItem(name, price){
+    if(!currentTableId){
+        alert("Vui lòng chọn bàn trước khi gọi món!");
+        return;
+    }
+
+    let cart = tableOrders[currentTableId];
+    if(!cart[name]) {
+        cart[name] = { price: price, qty: 1 };
+    } else {
+        cart[name].qty++;
+    }
+    renderOrder();
+    updateTableStatus();
+}
+
+// Hàm hiển thị danh sách món (Render)
+function renderOrder(){
+    if (!currentTableId) return;
+
+    let cart = tableOrders[currentTableId];
+    let container = document.getElementById("orderList");
+    let html = "";
+    let total = 0;
+
+    if (Object.keys(cart).length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#888; margin-top:50px;">Chưa có món nào</p>';
+        document.getElementById("totalMoney").innerText = "0 đ";
+        return;
+    }
+
+    for (let name in cart) {
+        let item = cart[name];
+        let itemTotal = item.qty * item.price;
+        total += itemTotal;
+
+        html += `
+        <div class="order-item">
+            <div>
+                <div style="font-weight:bold; font-size:15px;">${name}</div>
+                <div class="qty-control">
+                    <button class="qty-btn" onclick="updateQty('${name}', -1)">-</button>
+                    <span>${item.qty}</span>
+                    <button class="qty-btn" onclick="updateQty('${name}', 1)">+</button>
+                    <div style="font-size:12px; color:#666; margin-left:5px;">x ${item.price.toLocaleString()}</div>
+                </div>
+            </div>
+            <div>
+                <div style="font-weight:bold;">${itemTotal.toLocaleString()} đ</div>
+                <div style="text-align:right;"><i class="fa-solid fa-trash remove-btn" onclick="removeItem('${name}')"></i></div>
+            </div>
+        </div>
+        `;
+    }
+
+    container.innerHTML = html;
+    document.getElementById("totalMoney").innerText = total.toLocaleString() + " đ";
+}
+
+function updateQty(name, delta) {
+    let cart = tableOrders[currentTableId];
+    if(cart[name]) {
+        cart[name].qty += delta;
+        if (cart[name].qty <= 0) delete cart[name];
+    }
+    renderOrder();
+    updateTableStatus();
+}
+
+function removeItem(name) {
+    if (confirm("Xóa món " + name + "?")) {
+        let cart = tableOrders[currentTableId];
+        delete cart[name];
+        renderOrder();
+        updateTableStatus();
+    }
+}
+
+function pay() {
+    if (!currentTableId) return;
+    let cart = tableOrders[currentTableId];
+    if (Object.keys(cart).length === 0) {
+        alert("Bàn này chưa có món nào!");
+        return;
+    }
+    let total = 0;
+    for(let k in cart) total += cart[k].qty * cart[k].price;
+
+    if (confirm(`Xác nhận thanh toán cho ${currentTableId}?\nTổng tiền: ${total.toLocaleString()} đ`)) {
+        tableOrders[currentTableId] = {}; 
+        alert("Thanh toán thành công!");
+        renderOrder();
+        updateTableStatus();
+    }
+}
+
+function updateTableStatus() {
+    let buttons = document.querySelectorAll(".table-bar button");
+    let tableIdMap = {"Bàn 1": "B1", "Bàn 2": "B2", "Bàn 3": "B3", "Bàn 4": "B4", "Bàn 5": "B5"};
+    buttons.forEach(btn => {
+        let tId = tableIdMap[btn.innerText];
+        if (tableOrders[tId] && Object.keys(tableOrders[tId]).length > 0) {
+            btn.classList.add("has-order");
+        } else {
+            btn.classList.remove("has-order");
+        }
+    });
+}
+</script>
+
+</body>
+</html>

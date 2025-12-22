@@ -1,20 +1,19 @@
 // ===============================
-// ĐIỀU HƯỚNG TRANG
+// ĐIỀU HƯỚNG TRANG (Hàm go)
 // ===============================
 function go(page) {
     window.location.href = page;
 }
 
 // ===============================
-// ĐĂNG XUẤT
+// ĐĂNG XUẤT (Hàm logout)
 // ===============================
 function logout() {
     const ok = confirm("Bạn có chắc muốn đăng xuất?");
     if (ok) {
-        window.location.href = "login-check.html";
+        window.location.href = "giao diện đăng nhập.html";
     }
 }
-
 // ===============================
 // ACTIVE MENU (nếu dùng nav)
 // ===============================
