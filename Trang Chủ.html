@@ -170,6 +170,79 @@ body{
     .sidebar { display: none; }
     .order-area { height: 50vh; border-top: 5px solid #eee;}
 }
+/* --- CSS CHO MODAL THANH TOÁN --- */
+.modal {
+    display: none; /* Mặc định ẩn */
+    position: fixed;
+    z-index: 100;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5); /* Nền mờ */
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background-color: white;
+    padding: 25px;
+    border-radius: 15px;
+    width: 400px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.pay-options {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+.pay-btn {
+    padding: 10px 20px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    font-weight: bold;
+    flex: 1;
+    margin: 0 5px;
+}
+.pay-btn.active {
+    border-color: #27ae60;
+    color: #27ae60;
+    background: #e8f8f5;
+}
+.pay-section { display: none; margin-top: 15px; }
+.pay-section.active { display: block; }
+
+/* Input tiền mặt */
+.money-input {
+    width: 100%;
+    padding: 12px;
+    font-size: 18px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+.change-info {
+    font-size: 16px;
+    color: #e74c3c;
+    font-weight: bold;
+    margin: 10px 0;
+}
+/* Ảnh QR */
+.qr-img {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+.close-modal {
+    margin-top: 15px;
+    background: #aaa;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+}
 </style>
 </head>
 
@@ -179,7 +252,7 @@ body{
 
     <div class="sidebar">
         <h2><i class="fa-solid fa-mug-hot"></i> CAFREE</h2>
-        <button onclick="go('us06-them-mon-moi.html')"><i class="fa-solid fa-plus"></i> Thêm món</button>
+        <button onclick="go('thong-tin-nhan-vien.html')"><i class="fa-solid fa-plus"></i> Thông tin nhân viên</button>
         <button onclick="go('danh-sach-ban.html')"><i class="fa-solid fa-table"></i> Quản lý bàn</button>
         <button onclick="go('thong-ke.html')"><i class="fa-solid fa-chart-line"></i> Thống kê</button>
         <div style="flex:1"></div>
@@ -197,6 +270,7 @@ body{
                 <button onclick="selectTable(this, 'B3')">Bàn 3</button>
                 <button onclick="selectTable(this, 'B4')">Bàn 4</button>
                 <button onclick="selectTable(this, 'B5')">Bàn 5</button>
+                <button onclick="selectTable(this, 'Mang về')" style="background: #e67e22; color: white;">Mang về</button>
             </div>
         </div>
 
@@ -275,7 +349,7 @@ body{
 
 <script>
 // ============================================
-// LOGIC POS (ĐÃ SỬA LỖI & GIỮ NGUYÊN DANH SÁCH MÓN)
+// LOGIC POS 
 // ============================================
 
 let tableOrders = {}; 
@@ -375,22 +449,98 @@ function removeItem(name) {
     }
 }
 
+// ============================================
+// LOGIC THANH TOÁN MỚI (MODAL)
+// ============================================
+
+// 1. Hàm mở Popup khi ấn nút THANH TOÁN ở ngoài
 function pay() {
-    if (!currentTableId) return;
+    if (!currentTableId) { alert("Chưa chọn bàn!"); return; }
+    
     let cart = tableOrders[currentTableId];
     if (Object.keys(cart).length === 0) {
         alert("Bàn này chưa có món nào!");
         return;
     }
+
+    // Tính tổng tiền
     let total = 0;
     for(let k in cart) total += cart[k].qty * cart[k].price;
 
-    if (confirm(`Xác nhận thanh toán cho ${currentTableId}?\nTổng tiền: ${total.toLocaleString()} đ`)) {
-        tableOrders[currentTableId] = {}; 
-        alert("Thanh toán thành công!");
-        renderOrder();
-        updateTableStatus();
+    // Hiển thị thông tin lên Modal
+    document.getElementById("modalTableName").innerText = currentTableId;
+    document.getElementById("modalTotalMoney").innerText = total.toLocaleString() + " đ";
+    document.getElementById("modalTotalMoney").dataset.value = total; // Lưu giá trị số để tính toán
+    
+    // Reset form tiền mặt
+    document.getElementById("customerPay").value = "";
+    document.getElementById("changeText").innerText = "Tiền thừa: 0 đ";
+    
+    // Mở Modal
+    document.getElementById("paymentModal").style.display = "flex";
+}
+
+// 2. Hàm đóng Popup
+function closeModal() {
+    document.getElementById("paymentModal").style.display = "none";
+}
+
+// 3. Hàm chuyển đổi giữa Tiền mặt và QR
+function switchMethod(method) {
+    // Ẩn hết các section
+    document.querySelectorAll('.pay-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.pay-btn').forEach(el => el.classList.remove('active'));
+
+    // Hiện section được chọn
+    if (method === 'cash') {
+        document.getElementById('section-cash').classList.add('active');
+        document.querySelectorAll('.pay-btn')[0].classList.add('active');
+    } else {
+        document.getElementById('section-qr').classList.add('active');
+        document.querySelectorAll('.pay-btn')[1].classList.add('active');
     }
+}
+
+// 4. Hàm tính tiền thừa (khi nhập tiền khách đưa)
+function calcChange() {
+    let total = parseFloat(document.getElementById("modalTotalMoney").dataset.value);
+    let customerPay = parseFloat(document.getElementById("customerPay").value) || 0;
+    let change = customerPay - total;
+
+    if (change >= 0) {
+        document.getElementById("changeText").innerText = "Tiền thừa: " + change.toLocaleString() + " đ";
+        document.getElementById("changeText").style.color = "#27ae60"; // Màu xanh
+    } else {
+        document.getElementById("changeText").innerText = "Thiếu: " + Math.abs(change).toLocaleString() + " đ";
+        document.getElementById("changeText").style.color = "#e74c3c"; // Màu đỏ
+    }
+}
+
+// 5. Hàm Xác nhận thanh toán cuối cùng
+function confirmPayment(type) {
+    let total = parseFloat(document.getElementById("modalTotalMoney").dataset.value);
+    
+    if (type === 'cash') {
+        let customerPay = parseFloat(document.getElementById("customerPay").value) || 0;
+        let change = customerPay - total;
+        
+        // Logic: Nếu khách đưa đủ hoặc thừa -> OK. Nếu thiếu mà vẫn ấn -> Vẫn cho qua (theo yêu cầu của bạn)
+        if (change >= 0) {
+            alert(`Thanh toán THÀNH CÔNG!\nTrả lại khách: ${change.toLocaleString()} đ`);
+        } else {
+            // Trường hợp khách đưa thiếu nhưng vẫn bấm thanh toán
+             alert("Thanh toán thành công!");
+        }
+    } else {
+        // Trường hợp chuyển khoản
+        alert("Xác nhận đã nhận được tiền chuyển khoản!\nThanh toán thành công.");
+    }
+
+    // Xóa dữ liệu bàn và đóng modal
+    tableOrders[currentTableId] = {};
+    renderOrder();
+    updateTableStatus();
+    closeModal();
 }
 
 function updateTableStatus() {
@@ -406,6 +556,32 @@ function updateTableStatus() {
     });
 }
 </script>
+<div id="paymentModal" class="modal">
+    <div class="modal-content">
+        <h3>Thanh toán: <span id="modalTableName"></span></h3>
+        <h2 id="modalTotalMoney" style="color:#27ae60">0 đ</h2>
+        <p style="margin-top: -10px; margin-bottom: 20px; color: #666;">
+        Giờ thanh toán: <span id="modalPaymentTime" style="font-weight:bold; color:#333">--:--</span>
+        </p>
+        <div class="pay-options">
+            <button class="pay-btn active" onclick="switchMethod('cash')">💵 Tiền mặt</button>
+            <button class="pay-btn" onclick="switchMethod('qr')">🏦 Chuyển khoản</button>
+        </div>
 
+        <div id="section-cash" class="pay-section active">
+            <input type="number" id="customerPay" class="money-input" placeholder="Nhập tiền khách đưa..." oninput="calcChange()">
+            <div class="change-info" id="changeText">Tiền thừa: 0 đ</div>
+            <button class="btn-pay" onclick="confirmPayment('cash')">XÁC NHẬN THANH TOÁN</button>
+        </div>
+
+        <div id="section-qr" class="pay-section">
+            <p>Quét mã QR để thanh toán</p>
+            <img src="images/qr.png" class="qr-img" alt="QR Code">
+            <button class="btn-pay" onclick="confirmPayment('qr')">ĐÃ CHUYỂN KHOẢN XONG</button>
+        </div>
+
+        <button class="close-modal" onclick="closeModal()">Đóng lại</button>
+    </div>
+</div>
 </body>
 </html>
