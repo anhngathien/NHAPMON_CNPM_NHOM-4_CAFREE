@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thống kê & Báo cáo | CAFREE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f3f4f6; margin: 0; padding: 20px; }
+        
+        /* Header */
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: white; padding: 15px 20px; border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px;
+        }
+        .header h2 { margin: 0; color: #6a11cb; display: flex; align-items: center; gap: 10px; }
+        .btn-back {
+            text-decoration: none; background: #6a11cb; color: white;
+            padding: 10px 20px; border-radius: 8px; font-weight: bold;
+        }
+
+        /* Filter Bar (Thanh lọc tháng) */
+        .filter-bar {
+            background: white; padding: 15px 20px; border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px;
+            display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
+        }
+        .filter-group { display: flex; align-items: center; gap: 10px; }
+        input[type="month"] {
+            padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;
+        }
+        .btn-word {
+            background: #2980b9; color: white; border: none; padding: 10px 15px;
+            border-radius: 6px; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-word:hover { background: #1c5980; }
+
+        /* Dashboard Cards */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px; margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white; padding: 20px; border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center;
+        }
+        .stat-value { font-size: 24px; font-weight: bold; color: #27ae60; margin-top: 10px; }
+        .stat-label { color: #666; font-size: 14px; }
+
+        /* Table */
+        .table-container {
+            background: white; padding: 20px; border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: #333; }
+        tr:hover { background: #f1f1f1; }
+        
+        .btn-danger {
+            background: #e74c3c; color: white; border: none;
+            padding: 8px 12px; border-radius: 6px; cursor: pointer; width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2><i class="fa-solid fa-chart-pie"></i> BÁO CÁO DOANH THU</h2>
+        <a href="index.html" class="btn-back">⬅ Quay lại Bán hàng</a>
+    </div>
+
+    <div class="filter-bar">
+        <div class="filter-group">
+            <label style="font-weight:bold;">Chọn tháng:</label>
+            <input type="month" id="monthPicker" onchange="loadData()">
+        </div>
+
+        <div style="flex:1"></div> <button class="btn-word" onclick="exportToWord()">
+            <i class="fa-solid fa-file-word"></i> Xuất Báo Cáo (Word)
+        </button>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Tổng hóa đơn (Tháng này)</div>
+            <div class="stat-value" id="totalCount">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Tổng doanh thu (Tháng này)</div>
+            <div class="stat-value" id="totalRevenue">0 đ</div>
+        </div>
+        <div class="stat-card" style="padding: 10px;">
+            <button class="btn-danger" onclick="clearData()" style="height:100%;">
+                🗑️ Xóa dữ liệu gốc
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <h3>Chi tiết hóa đơn</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã HĐ</th>
+                    <th>Ngày giờ</th>
+                    <th>Bàn / Loại</th>
+                    <th>Tổng tiền</th>
+                </tr>
+            </thead>
+            <tbody id="historyTable">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Khi tải trang: Đặt mặc định là tháng hiện tại và tải dữ liệu
+        document.addEventListener("DOMContentLoaded", function() {
+            const now = new Date();
+            const monthStr = now.toISOString().slice(0, 7); // Lấy dạng YYYY-MM
+            document.getElementById("monthPicker").value = monthStr;
+            
+            loadData();
+        });
+
+        // Biến toàn cục lưu dữ liệu đang hiển thị để dùng cho xuất báo cáo
+        let currentMonthData = [];
+        let currentRevenue = 0;
+
+        function loadData() {
+            // 1. Lấy tất cả lịch sử
+            let fullHistory = JSON.parse(localStorage.getItem('invoiceHistory')) || [];
+            
+            // 2. Lấy tháng người dùng đang chọn (YYYY-MM)
+            let selectedMonth = document.getElementById("monthPicker").value; // Ví dụ: "2025-12"
+            
+            let tableBody = document.getElementById("historyTable");
+            currentRevenue = 0;
+            currentMonthData = []; // Reset dữ liệu tạm
+
+            tableBody.innerHTML = "";
+
+            // 3. Lọc và hiển thị
+            fullHistory.forEach(invoice => {
+                // invoice.date đang dạng "23/12/2025" -> Cần chuyển về YYYY-MM để so sánh
+                let parts = invoice.date.split('/'); // ["23", "12", "2025"]
+                // Lưu ý: Nếu máy bạn lưu dạng khác thì cần chỉnh lại dòng này
+                // Giả sử scripts.js lưu dạng dd/mm/yyyy
+                let invoiceMonth = "";
+                if(parts.length === 3) {
+                     invoiceMonth = `${parts[2]}-${parts[1]}`; // "2025-12"
+                }
+
+                // Nếu trùng khớp tháng đã chọn
+                if (invoiceMonth === selectedMonth) {
+                    currentMonthData.push(invoice); // Lưu vào danh sách tạm
+                    currentRevenue += invoice.total;
+
+                    let row = `
+                        <tr>
+                            <td style="font-weight:bold; color:#6a11cb">${invoice.code}</td>
+                            <td>${invoice.date} - ${invoice.time}</td>
+                            <td>
+                                <span style="background:${invoice.table==='Mang về'?'#fff3cd':'#e8f5e9'}; padding:4px 8px; border-radius:4px;">
+                                    ${invoice.table}
+                                </span>
+                            </td>
+                            <td style="font-weight:bold;">${invoice.total.toLocaleString()} đ</td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                }
+            });
+
+            // 4. Cập nhật số liệu tổng quan
+            document.getElementById("totalCount").innerText = currentMonthData.length;
+            document.getElementById("totalRevenue").innerText = currentRevenue.toLocaleString() + " đ";
+        }
+
+        // --- HÀM XUẤT FILE WORD ---
+        function exportToWord() {
+            if (currentMonthData.length === 0) {
+                alert("Không có dữ liệu trong tháng này để xuất báo cáo!");
+                return;
+            }
+
+            let monthVal = document.getElementById("monthPicker").value; // "2025-12"
+            let [year, month] = monthVal.split("-");
+
+            // Tạo nội dung HTML cho file Word
+            let htmlContent = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head><meta charset='utf-8'><title>Báo cáo doanh thu</title>
+                <style>
+                    body { font-family: 'Times New Roman', serif; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; text-align: center; font-weight: bold; }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .total { margin-top: 20px; font-size: 18px; font-weight: bold; text-align: right; }
+                </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1 style="margin:0">CỬA HÀNG CAFREE</h1>
+                        <h2 style="margin:5px 0">BÁO CÁO DOANH THU</h2>
+                        <p>Tháng ${month} năm ${year}</p>
+                    </div>
+
+                    <p><strong>Ngày xuất:</strong> ${new Date().toLocaleString('vi-VN')}</p>
+                    <p><strong>Tổng số hóa đơn:</strong> ${currentMonthData.length}</p>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Mã HĐ</th>
+                                <th>Ngày giờ</th>
+                                <th>Bàn</th>
+                                <th>Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            // Vòng lặp thêm từng dòng dữ liệu vào bảng
+            currentMonthData.forEach((inv, index) => {
+                htmlContent += `
+                    <tr>
+                        <td style="text-align:center">${index + 1}</td>
+                        <td>${inv.code}</td>
+                        <td>${inv.date} ${inv.time}</td>
+                        <td>${inv.table}</td>
+                        <td style="text-align:right">${inv.total.toLocaleString()} đ</td>
+                    </tr>
+                `;
+            });
+
+            // Kết thúc bảng và thêm tổng tiền
+            htmlContent += `
+                        </tbody>
+                    </table>
+                    
+                    <div class="total">
+                        TỔNG DOANH THU: ${currentRevenue.toLocaleString()} VNĐ
+                    </div>
+                    
+                    <br><br>
+                    <div style="display:flex; justify-content:space-between; margin-top:50px">
+                        <div style="text-align:center; width:40%; float:left">
+                            <strong>Người lập biểu</strong><br>
+                            (Ký, họ tên)
+                        </div>
+                        <div style="text-align:center; width:40%; float:right">
+                            <strong>Quản lý xác nhận</strong><br>
+                            (Ký, họ tên)
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            // Tạo file Blob và tải về
+            let blob = new Blob(['\ufeff', htmlContent], {
+                type: 'application/msword'
+            });
+            
+            // Tạo link ảo để tải
+            let url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(htmlContent);
+            
+            let downloadLink = document.createElement("a");
+            document.body.appendChild(downloadLink);
+            
+            if(navigator.msSaveOrOpenBlob ){
+                navigator.msSaveOrOpenBlob(blob, `Bao_cao_doanh_thu_${month}_${year}.doc`);
+            } else {
+                downloadLink.href = url;
+                downloadLink.download = `Bao_cao_doanh_thu_${month}_${year}.doc`;
+                downloadLink.click();
+            }
+            
+            document.body.removeChild(downloadLink);
+        }
+
+        function clearData() {
+            if (confirm("CẢNH BÁO: Bạn có chắc muốn XÓA SẠCH toàn bộ dữ liệu bán hàng không? Hành động này không thể hoàn tác!")) {
+                localStorage.removeItem('invoiceHistory');
+                loadData();
+                alert("Đã xóa dữ liệu gốc!");
+            }
+        }
+    </script>
+
+</body>
+</html>

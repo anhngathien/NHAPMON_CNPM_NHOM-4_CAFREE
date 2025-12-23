@@ -248,10 +248,13 @@ body{
 }
 /* Ảnh QR */
 .qr-img {
-    width: 200px;
-    height: 200px;
+    width: 180px !important;  /* !important: Bắt buộc dùng kích thước này */
+    height: 180px !important; /* Cố định chiều cao */
     object-fit: contain;
-    margin-bottom: 10px;
+    margin: 15px auto; /* Căn giữa và tạo khoảng cách trên dưới */
+    display: block;    /* Để căn giữa hoạt động */
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Thêm bóng nhẹ cho đẹp */
 }
 .close-modal {
     margin-top: 15px;
@@ -272,10 +275,10 @@ body{
     <div class="sidebar">
         <h2><i class="fa-solid fa-mug-hot"></i> CAFREE</h2>
         <button onclick="go('thong-tin-nhan-vien.html')"><i class="fa-solid fa-plus"></i> Thông tin nhân viên</button>
-        <button onclick="go('danh-sach-ban.html')"><i class="fa-solid fa-table"></i> Quản lý bàn</button>
+        <button onclick="go('Ghi chú.html')"><i class="fa-solid fa-table"></i> Ghi chú</button>
         <button onclick="go('thong-ke.html')"><i class="fa-solid fa-chart-line"></i> Thống kê</button>
         <div style="flex:1"></div>
-        <button onclick="logout()" style="background: rgba(231, 76, 60, 0.8);">
+        <button onclick="go('giao diện đăng nhập.html')" style="background: rgba(231, 76, 60, 0.8);">
             <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
         </button>
     </div>
@@ -681,10 +684,17 @@ function updateTableStatus() {
 <div id="paymentModal" class="modal">
     <div class="modal-content">
         <h3>Thanh toán: <span id="modalTableName"></span></h3>
-        <h2 id="modalTotalMoney" style="color:#27ae60">0 đ</h2>
-        <p style="margin-top: -10px; margin-bottom: 20px; color: #666;">
-        Giờ thanh toán: <span id="modalPaymentTime" style="font-weight:bold; color:#333">--:--</span>
+        
+        <p style="color: #666; font-size: 14px; margin-bottom: 5px;">
+            Mã HĐ: <span id="modalInvoiceCode" style="font-weight:bold; color:#000;">...</span>
         </p>
+
+        <h2 id="modalTotalMoney" style="color:#27ae60">0 đ</h2>
+        
+        <p style="margin-top: -10px; margin-bottom: 20px; color: #666;">
+            Giờ thanh toán: <span id="modalPaymentTime" style="font-weight:bold; color:#333">--:--</span>
+        </p>
+
         <div class="pay-options">
             <button class="pay-btn active" onclick="switchMethod('cash')">💵 Tiền mặt</button>
             <button class="pay-btn" onclick="switchMethod('qr')">🏦 Chuyển khoản</button>
@@ -698,7 +708,7 @@ function updateTableStatus() {
 
         <div id="section-qr" class="pay-section">
             <p>Quét mã QR để thanh toán</p>
-            <img src="images/qr.png" class="qr-img" alt="QR Code">
+            <img src="images/qr.jpg" class="qr-img" alt="QR Code" width="180" height="180">
             <button class="btn-pay" onclick="confirmPayment('qr')">ĐÃ CHUYỂN KHOẢN XONG</button>
         </div>
 
