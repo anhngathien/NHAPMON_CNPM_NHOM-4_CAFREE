@@ -182,7 +182,27 @@ body{
     transition: 0.3s;
 }
 .btn-pay:hover { background: #219150; }
-
+.order-note {
+    margin-top: 10px;
+    padding: 10px 0;
+    border-top: 1px dashed #ddd;
+}
+.order-note textarea {
+    width: 100%;
+    height: 50px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    resize: none;
+    font-family: inherit;
+    font-size: 14px;
+    background: #fafafa;
+}
+.order-note textarea:focus {
+    outline: none;
+    border-color: #6a11cb; /* Màu tím theo theme của bạn */
+    background: white;
+}
 /* Responsive Mobile */
 @media (max-width: 768px) {
     .pos-container { grid-template-columns: 1fr; height: auto;}
@@ -274,11 +294,38 @@ body{
 
     <div class="sidebar">
         <h2><i class="fa-solid fa-mug-hot"></i> CAFREE</h2>
-        <button onclick="go('thong-tin-nhan-vien.html')"><i class="fa-solid fa-plus"></i> Thông tin nhân viên</button>
-        <button onclick="go('Ghi chú.html')"><i class="fa-solid fa-table"></i> Ghi chú</button>
-        <button onclick="go('thong-ke.html')"><i class="fa-solid fa-chart-line"></i> Thống kê</button>
+        
+        <button onclick="go('Ghi chú.html')">
+            <i class="fa-solid fa-user-tag"></i> Thông tin nhân viên
+        </button>
+
+        <button onclick="go('Ghi chú.html')">
+            <i class="fa-solid fa-circle-plus"></i> Thêm món mới
+        </button>
+
+        <button onclick="go('Ghi chú.html')">
+            <i class="fa-solid fa-trash"></i> Xoá món
+        </button>
+
+        <button onclick="go('Ghi chú.html')">
+            <i class="fa-solid fa-pen-to-square"></i> Sửa món
+        </button>
+
+        <button onclick="go('Ghi chú.html')">
+            <i class="fa-solid fa-floppy-disk"></i> Lưu món
+        </button>
+
+        <button onclick="go('Ghi chú.html')">
+            <i class="fa-solid fa-list"></i> Xem danh sách món
+        </button>
+
         <div style="flex:1"></div>
-        <button onclick="go('giao diện đăng nhập.html')" style="background: rgba(231, 76, 60, 0.8);">
+
+        <button onclick="go('thong-ke.html')">
+            <i class="fa-solid fa-chart-line"></i> Thống kê
+        </button>
+
+        <button onclick="go('giao diện đăng nhập.html')" style="background: rgba(231, 76, 60, 0.8); margin-top: 10px;">
             <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
         </button>
     </div>
@@ -460,7 +507,9 @@ body{
         <div id="orderList" class="order-list">
             <p style="text-align:center; color:#888; margin-top:50px;">Chưa có món nào</p>
         </div>
-
+        <div class="order-note">
+        <textarea id="noteInput" placeholder="Ghi chú (VD: Ít đá, không đường...)"></textarea>
+        </div>
         <div class="total-section">
             <div class="total-row">
                 <span>Tổng tiền:</span>

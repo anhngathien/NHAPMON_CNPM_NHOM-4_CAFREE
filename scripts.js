@@ -195,29 +195,42 @@ function calcChange() {
 
 function confirmPayment(type) {
     let total = parseFloat(document.getElementById("modalTotalMoney").dataset.value);
-    let invoiceCode = document.getElementById("modalInvoiceCode").dataset.code;
+    
+    // 1. LẤY GHI CHÚ
+    let noteContent = document.getElementById("noteInput").value; 
 
+    // Xử lý tiền mặt (như cũ)
     if (type === 'cash') {
         let customerPay = parseFloat(document.getElementById("customerPay").value) || 0;
-        let rawChange = customerPay - total;
-        let change = Math.round(rawChange / 1000) * 1000;
-        if (change >= 0) {
-            alert(`Thanh toán THÀNH CÔNG!\nMã HĐ: ${invoiceCode}\nTrả lại khách: ${change.toLocaleString()} đ`);
-        } else {
-             alert(`Thanh toán thành công! (Khách trả thiếu)\nMã HĐ: ${invoiceCode}`);
+        let change = customerPay - total;
+        if (change < 0) {
+            // Nếu muốn bắt buộc đủ tiền mới cho qua thì mở comment dòng dưới
+            // alert("Khách đưa thiếu tiền!"); return; 
         }
+        alert(`Thanh toán THÀNH CÔNG!\nTrả lại: ${change.toLocaleString()} đ`);
     } else {
-        alert(`Đã nhận tiền chuyển khoản!\nMã HĐ: ${invoiceCode}\nThanh toán thành công.`);
+        alert("Đã xác nhận chuyển khoản thành công!");
     }
 
-    // LƯU VÀO LỊCH SỬ
-    saveInvoiceToStorage(invoiceCode, currentTableId, total);
+    // 2. LƯU VÀO LỊCH SỬ (localStorage) ĐỂ TRANG THỐNG KÊ ĐỌC ĐƯỢC
+    let newInvoice = {
+        id: "HD" + Date.now(), // Tạo mã hóa đơn ngẫu nhiên theo thời gian
+        date: new Date().toLocaleString('vi-VN'), // Ngày giờ hiện tại
+        table: currentTableId,
+        total: total,
+        note: noteContent // <--- LƯU GHI CHÚ VÀO ĐÂY
+    };
 
-    // RESET BÀN
-    tableOrders[currentTableId] = {};
-    delete tableTimestamps[currentTableId]; 
-    document.getElementById("orderTime").innerText = "--:--";
+    // Lấy danh sách cũ ra, thêm cái mới vào, rồi lưu lại
+    let history = JSON.parse(localStorage.getItem('salesHistory')) || [];
+    history.unshift(newInvoice); // Thêm vào đầu danh sách
+    localStorage.setItem('salesHistory', JSON.stringify(history));
 
+    // 3. DỌN DẸP DỮ LIỆU SAU KHI THANH TOÁN
+    tableOrders[currentTableId] = {}; // Xóa món trong bàn
+    
+    document.getElementById("noteInput").value = ""; // <--- LỆNH XÓA GHI CHÚ LÀ ĐÂY
+    
     renderOrder();
     updateTableStatus();
     closeModal();

@@ -79,7 +79,8 @@
             <input type="month" id="monthPicker" onchange="loadData()">
         </div>
 
-        <div style="flex:1"></div> <button class="btn-word" onclick="exportToWord()">
+        <div style="flex:1"></div> 
+        <button class="btn-word" onclick="exportToWord()">
             <i class="fa-solid fa-file-word"></i> Xuất Báo Cáo (Word)
         </button>
     </div>
@@ -108,7 +109,7 @@
                     <th>Mã HĐ</th>
                     <th>Ngày giờ</th>
                     <th>Bàn / Loại</th>
-                    <th>Tổng tiền</th>
+                    <th>Ghi chú</th> <th>Tổng tiền</th>
                 </tr>
             </thead>
             <tbody id="historyTable">
@@ -131,11 +132,11 @@
         let currentRevenue = 0;
 
         function loadData() {
-            // 1. Lấy tất cả lịch sử
-            let fullHistory = JSON.parse(localStorage.getItem('invoiceHistory')) || [];
+            // 1. Lấy tất cả lịch sử (Dùng salesHistory cho đồng bộ với trang Bán hàng)
+            let fullHistory = JSON.parse(localStorage.getItem('salesHistory')) || [];
             
             // 2. Lấy tháng người dùng đang chọn (YYYY-MM)
-            let selectedMonth = document.getElementById("monthPicker").value; // Ví dụ: "2025-12"
+            let selectedMonth = document.getElementById("monthPicker").value; 
             
             let tableBody = document.getElementById("historyTable");
             currentRevenue = 0;
@@ -145,10 +146,8 @@
 
             // 3. Lọc và hiển thị
             fullHistory.forEach(invoice => {
-                // invoice.date đang dạng "23/12/2025" -> Cần chuyển về YYYY-MM để so sánh
+                // Xử lý ngày tháng
                 let parts = invoice.date.split('/'); // ["23", "12", "2025"]
-                // Lưu ý: Nếu máy bạn lưu dạng khác thì cần chỉnh lại dòng này
-                // Giả sử scripts.js lưu dạng dd/mm/yyyy
                 let invoiceMonth = "";
                 if(parts.length === 3) {
                      invoiceMonth = `${parts[2]}-${parts[1]}`; // "2025-12"
@@ -156,18 +155,24 @@
 
                 // Nếu trùng khớp tháng đã chọn
                 if (invoiceMonth === selectedMonth) {
-                    currentMonthData.push(invoice); // Lưu vào danh sách tạm
+                    currentMonthData.push(invoice);
                     currentRevenue += invoice.total;
 
+                    // Tạo hàng cho bảng
                     let row = `
                         <tr>
-                            <td style="font-weight:bold; color:#6a11cb">${invoice.code}</td>
-                            <td>${invoice.date} - ${invoice.time}</td>
+                            <td style="font-weight:bold; color:#6a11cb">${invoice.id || invoice.code}</td>
+                            <td>${invoice.date} - ${invoice.time || ''}</td>
                             <td>
                                 <span style="background:${invoice.table==='Mang về'?'#fff3cd':'#e8f5e9'}; padding:4px 8px; border-radius:4px;">
                                     ${invoice.table}
                                 </span>
                             </td>
+                            
+                            <td style="color:#666; font-style:italic; max-width: 200px;">
+                                ${invoice.note || ''}
+                            </td>
+                            
                             <td style="font-weight:bold;">${invoice.total.toLocaleString()} đ</td>
                         </tr>
                     `;
@@ -187,7 +192,7 @@
                 return;
             }
 
-            let monthVal = document.getElementById("monthPicker").value; // "2025-12"
+            let monthVal = document.getElementById("monthPicker").value; 
             let [year, month] = monthVal.split("-");
 
             // Tạo nội dung HTML cho file Word
@@ -220,20 +225,22 @@
                                 <th>Mã HĐ</th>
                                 <th>Ngày giờ</th>
                                 <th>Bàn</th>
+                                <th>Ghi chú</th> 
                                 <th>Thành tiền</th>
                             </tr>
                         </thead>
                         <tbody>
             `;
 
-            // Vòng lặp thêm từng dòng dữ liệu vào bảng
+            // Vòng lặp thêm từng dòng dữ liệu vào bảng Word
             currentMonthData.forEach((inv, index) => {
                 htmlContent += `
                     <tr>
                         <td style="text-align:center">${index + 1}</td>
-                        <td>${inv.code}</td>
-                        <td>${inv.date} ${inv.time}</td>
+                        <td>${inv.id || inv.code}</td>
+                        <td>${inv.date} ${inv.time || ''}</td>
                         <td>${inv.table}</td>
+                        <td>${inv.note || ''}</td>
                         <td style="text-align:right">${inv.total.toLocaleString()} đ</td>
                     </tr>
                 `;
@@ -268,7 +275,6 @@
                 type: 'application/msword'
             });
             
-            // Tạo link ảo để tải
             let url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(htmlContent);
             
             let downloadLink = document.createElement("a");
@@ -287,7 +293,8 @@
 
         function clearData() {
             if (confirm("CẢNH BÁO: Bạn có chắc muốn XÓA SẠCH toàn bộ dữ liệu bán hàng không? Hành động này không thể hoàn tác!")) {
-                localStorage.removeItem('invoiceHistory');
+                // ĐÃ SỬA: Dùng salesHistory để xóa đúng dữ liệu
+                localStorage.removeItem('salesHistory'); 
                 loadData();
                 alert("Đã xóa dữ liệu gốc!");
             }

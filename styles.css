@@ -87,3 +87,26 @@ body {
 .logout {
     background: #e53935;
 }
+.order-note {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #ddd; /* Tạo đường kẻ ngăn cách với list món */
+}
+
+/* Định dạng cho ô nhập liệu (textarea) */
+.order-note textarea {
+    width: 100%;
+    height: 60px;           /* Chiều cao ô nhập */
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: #fafafa;
+    resize: none;           /* Chặn người dùng kéo to nhỏ làm vỡ giao diện */
+    font-family: inherit;   /* Dùng chung font chữ với web */
+    outline: none;
+}
+
+.order-note textarea:focus {
+    border-color: #2196F3;  /* Đổi màu viền khi bấm vào nhập */
+    background-color: #fff;
+}
