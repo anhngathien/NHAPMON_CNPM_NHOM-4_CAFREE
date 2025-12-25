@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thông Tin Nhân Viên | CAFREE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f4f6; margin: 0; display: flex; height: 100vh; }
+        
+        /* SIDEBAR (Giữ nguyên style cũ) */
+        .sidebar { width: 240px; background: linear-gradient(180deg,#6a11cb,#2575fc); color: white; padding: 20px; display: flex; flex-direction: column; }
+        .sidebar h2 { text-align: center; margin-bottom: 30px; }
+        .menu-btn { width: 100%; padding: 12px; margin-bottom: 12px; border: none; border-radius: 14px; background: rgba(255,255,255,0.2); color: white; cursor: pointer; text-align: left; font-size: 16px; transition: 0.3s; }
+        .menu-btn:hover, .menu-btn.active { background: rgba(255,255,255,0.4); font-weight: bold; }
+        .menu-btn i { margin-right: 10px; width: 20px; }
+
+        /* MAIN CONTENT */
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
+        .header-bar { background: white; padding: 15px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        /* PROFILE CARD */
+        .profile-section { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; gap: 30px; align-items: center; }
+        .avatar-box img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #6a11cb; }
+        .info-box { flex: 1; }
+        .info-box h2 { margin: 0 0 10px 0; color: #333; }
+        .info-row { margin-bottom: 8px; font-size: 16px; color: #555; }
+        .info-row i { width: 25px; color: #6a11cb; }
+        
+        .btn-checkin { background: #27ae60; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-checkin:hover { background: #219150; }
+        .btn-checkin.checked { background: #7f8c8d; cursor: not-allowed; }
+
+        /* ADMIN TABLE AREA */
+        .admin-panel { display: none; /* Mặc định ẩn, Admin mới hiện */ }
+        .table-container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; color: #6a11cb; }
+        
+        /* ACTION BUTTONS */
+        .action-btn { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; color: white; margin-right: 5px; font-size: 13px; }
+        .btn-edit { background: #3498db; }
+        .btn-salary { background: #f1c40f; color: #333; }
+        .btn-fire { background: #e74c3c; }
+        
+        /* Modal Popup styles */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;}
+        .modal-box { background: white; padding: 25px; border-radius: 10px; width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;}
+        .modal-actions { text-align: right; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2><i class="fa-solid fa-mug-hot"></i> CAFREE</h2>
+        <button class="menu-btn" onclick="window.location.href='Trang Chủ.html'"><i class="fa-solid fa-house"></i> Trang chủ</button>
+        <button class="menu-btn active" id="btnNhanVien"><i class="fa-solid fa-user-tag"></i> Thông tin nhân viên</button>
+        <button class="menu-btn" id="btnSuaMenu" onclick="window.location.href='sua-menu.html'"><i class="fa-solid fa-pen-to-square"></i> Sửa Menu</button>
+        <button class="menu-btn" id="btnThongKe" onclick="window.location.href='thong-ke.html'"><i class="fa-solid fa-chart-line"></i> Thống kê</button>
+    </div>
+
+    <div class="main-content">
+        <div class="header-bar">
+            <h3 style="margin:0">Hồ sơ nhân viên</h3>
+            <span id="welcomeMsg">Đang tải...</span>
+        </div>
+
+        <div class="profile-section" id="secCaNhan">
+            <div class="avatar-box">
+                <img src="https://via.placeholder.com/150" alt="Avatar">
+            </div>
+            <div class="info-box">
+                <h2 id="myName">Tên nhân viên</h2>
+                <div class="info-row"><i class="fa-solid fa-id-badge"></i> Tài khoản: <b id="myUser">...</b></div>
+                <div class="info-row"><i class="fa-solid fa-phone"></i> SĐT: <span id="myPhone">...</span></div>
+                <div class="info-row"><i class="fa-solid fa-clock"></i> Ca làm việc: <b id="myShift" style="color:#e67e22">...</b></div>
+                <div class="info-row"><i class="fa-solid fa-money-bill-wave"></i> Lương cơ bản: <b id="mySalary">...</b></div>
+                <div class="info-row" style="margin-top:15px; font-style: italic; color:#888" id="lastCheckin">Chưa chấm công hôm nay</div>
+            </div>
+            <div>
+                <button class="btn-checkin" id="btnCheckIn" onclick="handleCheckIn()">
+                    <i class="fa-solid fa-fingerprint"></i> CHẤM CÔNG NGAY
+                </button>
+            </div>
+        </div>
+
+        <div class="admin-panel" id="adminPanel">
+            <h3 style="color:#6a11cb; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                <i class="fa-solid fa-user-gear"></i> QUẢN LÝ NHÂN SỰ (Dành cho Chủ quán)
+            </h3>
+            <div class="table-container">
+                <button onclick="alert('Tính năng thêm nhân viên mới đang phát triển!')" style="background:#27ae60; color:white; border:none; padding:8px 15px; border-radius:4px; margin-bottom:10px; cursor:pointer;">+ Thêm nhân viên mới</button>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Họ tên</th>
+                            <th>Tài khoản</th>
+                            <th>Ca làm</th>
+                            <th>Lương/h</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffTable">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <h3>Sửa thông tin nhân viên</h3>
+            <input type="hidden" id="editIndex">
+            <div class="form-group">
+                <label>Họ tên:</label>
+                <input type="text" id="editName">
+            </div>
+            <div class="form-group">
+                <label>Ca làm việc:</label>
+                <input type="text" id="editShift">
+            </div>
+            <div class="form-group">
+                <label>Số điện thoại:</label>
+                <input type="text" id="editPhone">
+            </div>
+            <div class="modal-actions">
+                <button onclick="closeEditModal()" style="padding:8px 15px; cursor:pointer;">Hủy</button>
+                <button onclick="saveEdit()" style="background:#6a11cb; color:white; border:none; padding:8px 15px; cursor:pointer; margin-left:10px;">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script> 
+    <script>
+        // --- 1. KHỞI TẠO DỮ LIỆU ---
+        let users = JSON.parse(localStorage.getItem('cafeUsers')) || [];
+        let currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+
+        if (!currentUser) {
+            alert("Vui lòng đăng nhập!");
+            window.location.href = "login.html";
+        }
+
+        // --- 2. PHÂN QUYỀN HIỂN THỊ ---
+        
+        if (currentUser.role === 'admin') {
+            // == NẾU LÀ CHỦ QUÁN ==
+            // 1. Ẩn phần chấm công/thông tin cá nhân đi
+            document.getElementById("secCaNhan").style.display = "none";
+            
+            // 2. Hiện bảng quản lý nhân sự
+            document.getElementById("adminPanel").style.display = "block";
+            
+            // 3. Sửa câu chào ở header cho oai
+            document.getElementById("welcomeMsg").innerText = "Chào Chủ Quán, chúc một ngày tốt lành!";
+            
+            // 4. Vẽ bảng nhân viên
+            renderStaffTable();
+
+        } else {
+            // == NẾU LÀ NHÂN VIÊN ==
+            // 1. Hiện phần thông tin cá nhân để chấm công
+            document.getElementById("secCaNhan").style.display = "flex";
+            
+            // 2. Ẩn bảng quản lý (Dù CSS đã ẩn nhưng JS ẩn thêm cho chắc)
+            document.getElementById("adminPanel").style.display = "none";
+            
+            // 3. Load thông tin nhân viên đó lên
+            loadStaffInfo();
+        }
+
+        // Hàm hiển thị thông tin cá nhân (Chỉ chạy cho Nhân viên)
+        function loadStaffInfo() {
+            let myProfile = users.find(u => u.username === currentUser.username) || currentUser;
+            if (!myProfile.salary) myProfile.salary = 20000;
+
+            document.getElementById("welcomeMsg").innerText = `Nhân viên: ${myProfile.name}`;
+            document.getElementById("myName").innerText = myProfile.name;
+            document.getElementById("myUser").innerText = myProfile.username;
+            document.getElementById("myPhone").innerText = myProfile.phone || "Chưa cập nhật";
+            document.getElementById("myShift").innerText = myProfile.shift;
+            document.getElementById("mySalary").innerText = myProfile.salary.toLocaleString() + " đ/giờ";
+
+            // Check chấm công
+            let today = new Date().toLocaleDateString('vi-VN');
+            let checkLogs = JSON.parse(localStorage.getItem('checkLogs')) || {};
+            if (checkLogs[myProfile.username] === today) {
+                let btn = document.getElementById("btnCheckIn");
+                btn.innerText = "ĐÃ CHẤM CÔNG HÔM NAY";
+                btn.classList.add("checked");
+                document.getElementById("lastCheckin").innerText = "Đã điểm danh lúc: " + new Date().toLocaleTimeString();
+            }
+        }
+
+        // Hàm vẽ bảng quản lý (Chỉ chạy cho Admin)
+        function renderStaffTable() {
+            let tbody = document.getElementById("staffTable");
+            tbody.innerHTML = "";
+            users = JSON.parse(localStorage.getItem('cafeUsers')) || [];
+
+            users.forEach((u, index) => {
+                if (u.role === 'admin') return; // Không hiện admin vào danh sách
+                let luong = u.salary ? u.salary : 20000;
+
+                let row = `<tr>
+                    <td><strong>${u.name}</strong></td>
+                    <td>${u.username}</td>
+                    <td>${u.shift}</td>
+                    <td>${luong.toLocaleString()} đ/h</td>
+                    <td>
+                        <button class="action-btn btn-edit" onclick="openEdit(${index})" title="Sửa thông tin"><i class="fa-solid fa-pen"></i></button>
+                        <button class="action-btn btn-salary" onclick="changeSalary(${index})" title="Tăng/Giảm lương"><i class="fa-solid fa-money-bill"></i></button>
+                        <button class="action-btn btn-fire" onclick="fireUser(${index})" title="Sa thải"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // --- CÁC HÀM HÀNH ĐỘNG (Giữ nguyên như cũ) ---
+        function handleCheckIn() {
+            if (document.getElementById("btnCheckIn").classList.contains("checked")) return;
+            if (confirm("Xác nhận chấm công?")) {
+                let today = new Date().toLocaleDateString('vi-VN');
+                let checkLogs = JSON.parse(localStorage.getItem('checkLogs')) || {};
+                checkLogs[currentUser.username] = today;
+                localStorage.setItem('checkLogs', JSON.stringify(checkLogs));
+                alert("Chấm công thành công!");
+                location.reload();
+            }
+        }
+
+        function fireUser(index) {
+            let u = users[index];
+            if (confirm(`Bạn chắc chắn muốn sa thải [${u.name}]?`)) {
+                users.splice(index, 1);
+                localStorage.setItem('cafeUsers', JSON.stringify(users));
+                renderStaffTable();
+            }
+        }
+
+        function changeSalary(index) {
+            let u = users[index];
+            let newSal = prompt(`Nhập lương mới cho ${u.name}:`, u.salary || 20000);
+            if (newSal) {
+                users[index].salary = parseInt(newSal);
+                localStorage.setItem('cafeUsers', JSON.stringify(users));
+                renderStaffTable();
+            }
+        }
+
+        function openEdit(index) {
+            let u = users[index];
+            document.getElementById("editIndex").value = index;
+            document.getElementById("editName").value = u.name;
+            document.getElementById("editShift").value = u.shift;
+            document.getElementById("editPhone").value = u.phone;
+            document.getElementById("editModal").style.display = "flex";
+        }
+
+        function closeEditModal() { document.getElementById("editModal").style.display = "none"; }
+
+        function saveEdit() {
+            let index = document.getElementById("editIndex").value;
+            users[index].name = document.getElementById("editName").value;
+            users[index].shift = document.getElementById("editShift").value;
+            users[index].phone = document.getElementById("editPhone").value;
+            localStorage.setItem('cafeUsers', JSON.stringify(users));
+            renderStaffTable();
+            closeEditModal();
+        }
+    </script>
+</body>
+</html>

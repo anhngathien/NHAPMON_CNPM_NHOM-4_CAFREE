@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Menu | CAFREE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f4f6; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #6a11cb; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-save { background: #27ae60; }
+        .btn-back { background: #7f8c8d; }
+        .btn-reset { background: #e67e22; }
+
+        .menu-list { margin-top: 30px; border-top: 2px dashed #eee; padding-top: 20px; }
+        .menu-item { display: flex; align-items: center; justify-content: space-between; background: #fafafa; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #eee; }
+        .menu-item img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px; }
+        .item-info { flex: 1; }
+        .btn-delete { background: #e74c3c; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex: none;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2><i class="fa-solid fa-utensils"></i> QUẢN LÝ MENU (GitHub Pages Mode)</h2>
+
+    <div class="form-group">
+        <label>Tên món mới / cần sửa:</label>
+        <input type="text" id="name" placeholder="Ví dụ: Trà vải nhiệt đới">
+    </div>
+
+    <div class="form-group">
+        <label>Giá bán (VNĐ):</label>
+        <input type="number" id="price" placeholder="Ví dụ: 35000">
+    </div>
+
+    <div class="form-group">
+        <label>Ảnh món ăn:</label>
+        <input type="file" id="imgInput" accept="image/*">
+        <small style="color:#666">Chọn ảnh từ máy tính (Ảnh sẽ được mã hóa và lưu vào trình duyệt)</small>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-back" onclick="window.location.href='Trang Chủ.html'">⬅ Quay lại</button>
+        <button class="btn-reset" onclick="resetDefault()">↺ Khôi phục gốc</button>
+        <button class="btn-save" onclick="handleSave()">💾 LƯU MÓN</button>
+    </div>
+
+    <div class="menu-list">
+        <h3>Danh sách món hiện tại (<span id="count">0</span>)</h3>
+        <div id="listContainer"></div>
+    </div>
+</div>
+
+<script>
+    // Dữ liệu mẫu (nếu chưa có gì)
+    const defaultMenu = [
+        { name: "Cà phê đen", price: 15000, img: "https://via.placeholder.com/150?text=Cafe+Den" },
+        { name: "Cà phê sữa", price: 18000, img: "https://via.placeholder.com/150?text=Cafe+Sua" }
+    ];
+
+    // Hàm hiển thị danh sách
+    function renderAdminList() {
+        let menu = JSON.parse(localStorage.getItem('cafeMenu')) || defaultMenu;
+        let container = document.getElementById("listContainer");
+        document.getElementById("count").innerText = menu.length;
+        container.innerHTML = "";
+
+        menu.forEach((item, index) => {
+            container.innerHTML += `
+                <div class="menu-item">
+                    <img src="${item.img}" onerror="this.src='https://via.placeholder.com/50'">
+                    <div class="item-info">
+                        <strong>${item.name}</strong><br>
+                        ${item.price.toLocaleString()} đ
+                    </div>
+                    <button class="btn-delete" onclick="deleteItem(${index})" title="Xóa món này"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `;
+        });
+    }
+
+    // Hàm xử lý lưu (Logic chính cho GitHub Pages)
+    function handleSave() {
+        let name = document.getElementById("name").value.trim();
+        let price = parseInt(document.getElementById("price").value);
+        let fileInput = document.getElementById("imgInput");
+        
+        if (!name || !price) { alert("Vui lòng nhập tên và giá!"); return; }
+
+        // Kiểm tra xem người dùng có chọn ảnh mới không
+        if (fileInput.files && fileInput.files[0]) {
+            // Nếu có chọn ảnh -> Đọc ảnh thành mã Base64
+            let reader = new FileReader();
+            
+            reader.onload = function(e) {
+                let base64Image = e.target.result; // Đây là chuỗi mã hóa của ảnh
+                saveToLocalStorage(name, price, base64Image); // Gọi hàm lưu
+            }
+            
+            reader.readAsDataURL(fileInput.files[0]); // Bắt đầu đọc file
+        } else {
+            // Nếu không chọn ảnh -> Lưu với ảnh rỗng hoặc giữ ảnh cũ (xử lý ở bước sau)
+            saveToLocalStorage(name, price, null);
+        }
+    }
+
+    // Hàm lưu vào LocalStorage
+    function saveToLocalStorage(name, price, newImgBase64) {
+        let menu = JSON.parse(localStorage.getItem('cafeMenu')) || defaultMenu;
+        let index = menu.findIndex(i => i.name.toLowerCase() === name.toLowerCase());
+
+        if (index >= 0) {
+            // --- SỬA MÓN CŨ ---
+            menu[index].price = price;
+            // Chỉ cập nhật ảnh nếu có ảnh mới được chọn
+            if (newImgBase64) {
+                menu[index].img = newImgBase64;
+            }
+            alert("Đã cập nhật món: " + name);
+        } else {
+            // --- THÊM MÓN MỚI ---
+            // Nếu không có ảnh upload, dùng ảnh mặc định online
+            let finalImg = newImgBase64 ? newImgBase64 : "https://via.placeholder.com/150?text=No+Image";
+            menu.push({ name, price, img: finalImg });
+            alert("Đã thêm món mới: " + name);
+        }
+
+        try {
+            localStorage.setItem('cafeMenu', JSON.stringify(menu));
+            renderAdminList();
+            
+            // Reset form
+            document.getElementById("name").value = "";
+            document.getElementById("price").value = "";
+            document.getElementById("imgInput").value = ""; 
+        } catch (e) {
+            alert("Lỗi: Ảnh quá lớn, trình duyệt không lưu nổi! Hãy chọn ảnh nhỏ hơn.");
+        }
+    }
+
+    // Hàm xóa món
+    function deleteItem(index) {
+        if(confirm("Xóa món này nhé?")) {
+            let menu = JSON.parse(localStorage.getItem('cafeMenu')) || defaultMenu;
+            menu.splice(index, 1);
+            localStorage.setItem('cafeMenu', JSON.stringify(menu));
+            renderAdminList();
+        }
+    }
+
+    // Hàm khôi phục
+    function resetDefault() {
+        if(confirm("Khôi phục menu gốc?")) {
+            localStorage.setItem('cafeMenu', JSON.stringify(defaultMenu));
+            renderAdminList();
+        }
+    }
+
+    // Chạy khi mở trang
+    renderAdminList();
+</script>
+
+</body>
+</html>

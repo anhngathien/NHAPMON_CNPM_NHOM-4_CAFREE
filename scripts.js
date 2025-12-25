@@ -1,13 +1,73 @@
-// ===============================
-// FILE SCRIPTS.JS HOÀN CHỈNH
-// ===============================
+// --- 0. DỮ LIỆU MENU MẶC ĐỊNH (DATA) ---
+const defaultMenu = [
+    { name: "Trà sữa xoài", price: 35000, img: "images/tra-sua-xoai.jpg" },
+    { name: "Trà sữa matcha", price: 35000, img: "images/tra-sua-matcha.jpg" },
+    { name: "Sữa tươi đường nâu", price: 35000, img: "images/sua-tuoi-duong-nau.jpg" },
+    { name: "Trà sữa đào", price: 35000, img: "images/tra-sua-dao.jpg" },
+    { name: "Trà sữa thạch", price: 35000, img: "images/tra-sua-thach.jpg" },
+    { name: "Tào phớ trà xanh", price: 35000, img: "images/tao-pho-tra-xanh.jpg" },
+    { name: "Trà sữa kem cheese", price: 35000, img: "images/tra-sua-kem-cheese.jpg" },
+    { name: "Trà xanh", price: 35000, img: "images/tra-xanh.jpg" },
+    { name: "Smoothie dâu", price: 35000, img: "images/smoothie-dau.jpg" },
+    { name: "Trà sữa đậu đỏ", price: 35000, img: "images/tra-sua-dau-do.jpg" },
+    { name: "Trà ô long", price: 35000, img: "images/tra-o-long.jpg" },
+    { name: "Trà sữa oreo", price: 35000, img: "images/tra-sua-oreo.jpg" },
+    { name: "Trà hoa nhài", price: 35000, img: "images/tra-hoa-nhai.jpg" },
+    { name: "Cà phê đen", price: 25000, img: "images/cafe-den.jpg" },
+    { name: "Cà phê sữa", price: 28000, img: "images/cafe-sua.jpg" },
+    { name: "Bạc xỉu", price: 30000, img: "images/bac-xiu.jpg" },
+    { name: "Latte", price: 35000, img: "images/latte.jpg" },
+    { name: "Cappuccino", price: 38000, img: "images/cappuccino.jpg" },
+    { name: "Trà đào", price: 35000, img: "images/tra-dao.jpg" },
+    { name: "Trà chanh", price: 30000, img: "images/tra-chanh.jpg" },
+    { name: "Trà sữa truyền thống", price: 40000, img: "images/tra-sua.jpg" },
+    { name: "Nước cam", price: 35000, img: "images/nuoc-ep-cam.jpg" }
+];
 
-// 1. CÁC HÀM CHUNG
+// Hàm tải menu từ bộ nhớ ra màn hình
+function loadMenu() {
+    const menuGrid = document.querySelector(".menu-grid");
+    if (!menuGrid) return; // Nếu không tìm thấy chỗ hiển thị thì thôi
+
+    // Lấy menu từ bộ nhớ. Nếu chưa có thì dùng menu mặc định ở trên
+    let storedMenu = JSON.parse(localStorage.getItem('cafeMenu'));
+    if (!storedMenu || storedMenu.length === 0) {
+        storedMenu = defaultMenu;
+        localStorage.setItem('cafeMenu', JSON.stringify(storedMenu));
+    }
+
+    menuGrid.innerHTML = ""; // Xóa sạch nội dung cũ
+
+    // Vẽ từng món ra màn hình
+    storedMenu.forEach(item => {
+        let html = `
+            <div class="card" onclick="addItem('${item.name}', ${item.price})">
+                <img src="${item.img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/150?text=CAFREE'">
+                <div class="card-body">
+                    <b>${item.name}</b>
+                    <div class="price">${item.price.toLocaleString()} đ</div>
+                </div>
+            </div>
+        `;
+        menuGrid.innerHTML += html;
+    });
+}
+
+// Tự động chạy hàm loadMenu khi trang web tải xong
+window.addEventListener('DOMContentLoaded', (event) => {
+    loadMenu();
+});
+// --- 1. BIẾN TOÀN CỤC ---
+let tableOrders = {}; 
+let currentTableId = null;
+let currentMenu = []; // Sẽ dùng cho bước 2
+
+// --- 2. CÁC HÀM ĐIỀU HƯỚNG & HỆ THỐNG ---
 function go(page) { window.location.href = page; }
 
 function logout() {
     if (confirm("Bạn có chắc muốn đăng xuất?")) {
-        window.location.href = "login.html"; 
+        window.location.href = "giao diện đăng nhập.html"; 
     }
 }
 
@@ -18,55 +78,58 @@ function getCurrentTime() {
     return `${h}:${m}`;
 }
 
-// Hàm tạo mã hóa đơn ngẫu nhiên (Ví dụ: HD20251223-093012-123)
+// Tạo mã hóa đơn ngẫu nhiên
 function generateInvoiceCode() {
     let now = new Date();
     let id = now.getFullYear().toString() +
              (now.getMonth() + 1).toString().padStart(2, '0') +
              now.getDate().toString().padStart(2, '0') +
              now.getHours().toString().padStart(2, '0') +
-             now.getMinutes().toString().padStart(2, '0') +
-             now.getSeconds().toString().padStart(2, '0');
+             now.getMinutes().toString().padStart(2, '0');
     let random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
     return "HD" + id + "-" + random; 
 }
 
-// 2. QUẢN LÝ DỮ LIỆU
-let tableOrders = {}; 
-let tableTimestamps = {}; 
-let currentTableId = null;
+// --- 3. QUẢN LÝ BÁN HÀNG (POS) ---
 
+// Chọn bàn
 function selectTable(btn, tableId){
+    // Xóa class active ở các nút khác
     document.querySelectorAll(".table-bar button").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
+
     currentTableId = tableId;
     document.getElementById("currentTableName").innerText = "Hóa đơn: " + tableId;
+    document.getElementById("orderTime").innerText = "Giờ: " + getCurrentTime();
 
-    if (!tableOrders[tableId]) tableOrders[tableId] = {};
-
-    if (tableTimestamps[tableId]) {
-        document.getElementById("orderTime").innerText = "Giờ vào: " + tableTimestamps[tableId];
-    } else {
-        document.getElementById("orderTime").innerText = "--:--";
+    if (!tableOrders[tableId]) {
+        tableOrders[tableId] = {};
     }
+
     renderOrder();
 }
 
+// Thêm món vào giỏ
 function addItem(name, price){
-    if(!currentTableId){ alert("Vui lòng chọn bàn hoặc 'Mang về' trước!"); return; }
-    if (!tableTimestamps[currentTableId]) {
-        tableTimestamps[currentTableId] = getCurrentTime();
-        document.getElementById("orderTime").innerText = "Giờ vào: " + tableTimestamps[currentTableId];
+    if(!currentTableId){
+        alert("Vui lòng chọn bàn trước khi gọi món!");
+        return;
     }
+
     let cart = tableOrders[currentTableId];
-    if(!cart[name]) cart[name] = { price: price, qty: 1 };
-    else cart[name].qty++;
+    if(!cart[name]) {
+        cart[name] = { price: price, qty: 1 };
+    } else {
+        cart[name].qty++;
+    }
     renderOrder();
     updateTableStatus();
 }
 
+// Hiển thị danh sách món bên phải
 function renderOrder(){
     if (!currentTableId) return;
+
     let cart = tableOrders[currentTableId];
     let container = document.getElementById("orderList");
     let html = "";
@@ -82,6 +145,7 @@ function renderOrder(){
         let item = cart[name];
         let itemTotal = item.qty * item.price;
         total += itemTotal;
+
         html += `
         <div class="order-item">
             <div>
@@ -97,21 +161,15 @@ function renderOrder(){
                 <div style="font-weight:bold;">${itemTotal.toLocaleString()} đ</div>
                 <div style="text-align:right;"><i class="fa-solid fa-trash remove-btn" onclick="removeItem('${name}')"></i></div>
             </div>
-        </div>`;
-    }
-
-    let finalTotal = total;
-    let discountHtml = "";
-    if (currentTableId === 'Mang về') {
-        let discount = total * 0.3; 
-        finalTotal = total - discount;
-        discountHtml = `<div style="font-size:13px; color:#e74c3c; font-weight:normal;">(Gốc: ${total.toLocaleString()} - Giảm 30%)</div>`;
+        </div>
+        `;
     }
 
     container.innerHTML = html;
-    document.getElementById("totalMoney").innerHTML = finalTotal.toLocaleString() + " đ" + discountHtml;
+    document.getElementById("totalMoney").innerText = total.toLocaleString() + " đ";
 }
 
+// Tăng giảm số lượng
 function updateQty(name, delta) {
     let cart = tableOrders[currentTableId];
     if(cart[name]) {
@@ -122,6 +180,7 @@ function updateQty(name, delta) {
     updateTableStatus();
 }
 
+// Xóa món
 function removeItem(name) {
     if (confirm("Xóa món " + name + "?")) {
         let cart = tableOrders[currentTableId];
@@ -131,34 +190,57 @@ function removeItem(name) {
     }
 }
 
-// 3. THANH TOÁN & MODAL
+// Cập nhật trạng thái xanh/đỏ của bàn
+function updateTableStatus() {
+    let buttons = document.querySelectorAll(".table-bar button");
+    // Mapping tên hiển thị sang ID lưu trữ
+    let tableIdMap = {};
+    buttons.forEach(btn => {
+        // Lấy text của nút (VD: "Bàn 1") hoặc onclick value nếu có
+        // Ở đây ta dựa vào logic trong HTML của bạn
+        let text = btn.innerText; 
+        // Logic đơn giản: Check xem trong tableOrders có dữ liệu cho bàn này không
+        // Lưu ý: Trong HTML bạn gọi selectTable(this, 'B1') nhưng hiển thị là 'Bàn 1'
+        // Để đơn giản, ta sẽ check lại logic HTML sau.
+    });
+
+    // Cách đơn giản hơn: Loop qua object tableOrders
+    buttons.forEach(btn => {
+         // Lấy ID bàn từ thuộc tính onclick (phân tích chuỗi) hoặc gán cứng
+         // Tạm thời chỉ đổi màu nếu bàn hiện tại có món
+         if(btn.classList.contains('active') && currentTableId && tableOrders[currentTableId] && Object.keys(tableOrders[currentTableId]).length > 0){
+             btn.classList.add("has-order");
+         }
+    });
+}
+
+// --- 4. THANH TOÁN & MODAL ---
+
 function pay() {
     if (!currentTableId) { alert("Chưa chọn bàn!"); return; }
+    
     let cart = tableOrders[currentTableId];
-    if (Object.keys(cart).length === 0) { alert("Chưa có món nào!"); return; }
+    if (!cart || Object.keys(cart).length === 0) {
+        alert("Bàn này chưa có món nào!");
+        return;
+    }
 
+    // Tính tổng tiền
     let total = 0;
     for(let k in cart) total += cart[k].qty * cart[k].price;
 
-    let finalTotal = total;
-    if (currentTableId === 'Mang về') { finalTotal = total * 0.7; }
-
+    // Hiển thị thông tin lên Modal
     document.getElementById("modalTableName").innerText = currentTableId;
-    
-    // TẠO MÃ & GÁN VÀO HTML (Nếu HTML thiếu id modalInvoiceCode thì code sẽ lỗi tại đây)
-    let invoiceCode = generateInvoiceCode();
-    document.getElementById("modalInvoiceCode").innerText = invoiceCode;
-    document.getElementById("modalInvoiceCode").dataset.code = invoiceCode;
-
-    document.getElementById("modalTotalMoney").innerText = finalTotal.toLocaleString() + " đ";
-    if (currentTableId === 'Mang về') {
-         document.getElementById("modalTotalMoney").innerHTML += `<br><span style="font-size:14px; color:#666">(Đã giảm 30%)</span>`;
-    }
-    document.getElementById("modalTotalMoney").dataset.value = finalTotal;
+    document.getElementById("modalTotalMoney").innerText = total.toLocaleString() + " đ";
+    document.getElementById("modalTotalMoney").dataset.value = total; 
+    document.getElementById("modalInvoiceCode").innerText = generateInvoiceCode();
     document.getElementById("modalPaymentTime").innerText = getCurrentTime();
-
+    
+    // Reset form
     document.getElementById("customerPay").value = "";
     document.getElementById("changeText").innerText = "Tiền thừa: 0 đ";
+    
+    // Mở Modal
     document.getElementById("paymentModal").style.display = "flex";
 }
 
@@ -169,6 +251,7 @@ function closeModal() {
 function switchMethod(method) {
     document.querySelectorAll('.pay-section').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.pay-btn').forEach(el => el.classList.remove('active'));
+
     if (method === 'cash') {
         document.getElementById('section-cash').classList.add('active');
         document.querySelectorAll('.pay-btn')[0].classList.add('active');
@@ -181,84 +264,100 @@ function switchMethod(method) {
 function calcChange() {
     let total = parseFloat(document.getElementById("modalTotalMoney").dataset.value);
     let customerPay = parseFloat(document.getElementById("customerPay").value) || 0;
-    let rawChange = customerPay - total;
-    let change = Math.round(rawChange / 1000) * 1000;
+    let change = customerPay - total;
 
+    let textEl = document.getElementById("changeText");
     if (change >= 0) {
-        document.getElementById("changeText").innerText = "Tiền thừa: " + change.toLocaleString() + " đ";
-        document.getElementById("changeText").style.color = "#27ae60";
+        textEl.innerText = "Tiền thừa: " + change.toLocaleString() + " đ";
+        textEl.style.color = "#27ae60";
     } else {
-        document.getElementById("changeText").innerText = "Thiếu: " + Math.abs(change).toLocaleString() + " đ";
-        document.getElementById("changeText").style.color = "#e74c3c";
+        textEl.innerText = "Thiếu: " + Math.abs(change).toLocaleString() + " đ";
+        textEl.style.color = "#e74c3c";
     }
 }
 
 function confirmPayment(type) {
     let total = parseFloat(document.getElementById("modalTotalMoney").dataset.value);
-    
-    // 1. LẤY GHI CHÚ
-    let noteContent = document.getElementById("noteInput").value; 
+    let note = document.getElementById("noteInput").value;
+    let invoiceCode = document.getElementById("modalInvoiceCode").innerText;
 
-    // Xử lý tiền mặt (như cũ)
     if (type === 'cash') {
         let customerPay = parseFloat(document.getElementById("customerPay").value) || 0;
         let change = customerPay - total;
-        if (change < 0) {
-            // Nếu muốn bắt buộc đủ tiền mới cho qua thì mở comment dòng dưới
-            // alert("Khách đưa thiếu tiền!"); return; 
-        }
-        alert(`Thanh toán THÀNH CÔNG!\nTrả lại: ${change.toLocaleString()} đ`);
+        // Có thể thêm logic chặn nếu thiếu tiền ở đây
+        alert(`Thanh toán THÀNH CÔNG!\nTrả lại khách: ${change.toLocaleString()} đ`);
     } else {
-        alert("Đã xác nhận chuyển khoản thành công!");
+        alert("Xác nhận đã nhận chuyển khoản thành công!");
     }
 
-    // 2. LƯU VÀO LỊCH SỬ (localStorage) ĐỂ TRANG THỐNG KÊ ĐỌC ĐƯỢC
+    // --- LƯU LỊCH SỬ VÀO LOCALSTORAGE ---
     let newInvoice = {
-        id: "HD" + Date.now(), // Tạo mã hóa đơn ngẫu nhiên theo thời gian
-        date: new Date().toLocaleString('vi-VN'), // Ngày giờ hiện tại
+        id: invoiceCode,
+        date: new Date().toLocaleString('vi-VN'),
         table: currentTableId,
         total: total,
-        note: noteContent // <--- LƯU GHI CHÚ VÀO ĐÂY
+        note: note
     };
 
-    // Lấy danh sách cũ ra, thêm cái mới vào, rồi lưu lại
     let history = JSON.parse(localStorage.getItem('salesHistory')) || [];
-    history.unshift(newInvoice); // Thêm vào đầu danh sách
+    history.unshift(newInvoice);
     localStorage.setItem('salesHistory', JSON.stringify(history));
 
-    // 3. DỌN DẸP DỮ LIỆU SAU KHI THANH TOÁN
-    tableOrders[currentTableId] = {}; // Xóa món trong bàn
-    
-    document.getElementById("noteInput").value = ""; // <--- LỆNH XÓA GHI CHÚ LÀ ĐÂY
+    // Reset bàn
+    tableOrders[currentTableId] = {};
+    document.getElementById("noteInput").value = "";
     
     renderOrder();
     updateTableStatus();
     closeModal();
 }
+// --- PHẦN XỬ LÝ PHÂN QUYỀN (Auth Logic) ---
 
-function saveInvoiceToStorage(code, table, total) {
-    let now = new Date();
-    let invoice = {
-        code: code,
-        date: now.toLocaleDateString('vi-VN'),
-        time: getCurrentTime(),
-        table: table,
-        total: total
-    };
-    let history = JSON.parse(localStorage.getItem('invoiceHistory')) || [];
-    history.unshift(invoice);
-    localStorage.setItem('invoiceHistory', JSON.stringify(history));
+// Sự kiện này đảm bảo HTML đã tải xong thì mới chạy code bên trong
+document.addEventListener("DOMContentLoaded", function() {
+    checkUserPermission();
+});
+
+function checkUserPermission() {
+    // 1. Chỉ chạy logic này nếu đang ở trang có cần đăng nhập (Tránh lỗi ở trang Login)
+    // Nếu không tìm thấy vùng hiển thị tên user -> có thể đang ở trang Login -> bỏ qua
+    if (!document.getElementById("welcomeMsg")) return;
+
+    // 2. Lấy user từ bộ nhớ
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+
+    // 3. Nếu chưa đăng nhập -> Đuổi về Login
+    if (!currentUser) {
+        alert("Vui lòng đăng nhập để tiếp tục!");
+        window.location.href = "login.html";
+        return;
+    }
+
+    // 4. Hiển thị tên và vai trò
+    const roleName = currentUser.role === 'admin' ? 'Chủ quán' : 'Nhân viên';
+    const welcomeMsg = document.getElementById("welcomeMsg");
+    if (welcomeMsg) {
+        welcomeMsg.innerHTML = `Xin chào, <strong>${currentUser.name}</strong> (${roleName})`;
+    }
+
+    // 5. NẾU LÀ NHÂN VIÊN -> ẨN CÁC NÚT QUẢN LÝ
+    if (currentUser.role !== 'admin') {
+        // Danh sách các ID của nút cần ẩn
+        const buttonsToHide = ["btnSuaMenu", "btnThongKe", "btnAdminOnly"];
+
+        buttonsToHide.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.style.display = "none"; // Ẩn nút đi
+            }
+        });
+    }
 }
 
-function updateTableStatus() {
-    let buttons = document.querySelectorAll(".table-bar button");
-    let tableIdMap = { "Bàn 1": "B1", "Bàn 2": "B2", "Bàn 3": "B3", "Bàn 4": "B4", "Bàn 5": "B5", "Mang về": "Mang về" };
-    buttons.forEach(btn => {
-        let tId = tableIdMap[btn.innerText];
-        if (tableOrders[tId] && Object.keys(tableOrders[tId]).length > 0) {
-            btn.classList.add("has-order");
-        } else {
-            btn.classList.remove("has-order");
-        }
-    });
+// Hàm đăng xuất (để global để nút HTML gọi được)
+function logout() {
+    if(confirm("Bạn muốn đăng xuất khỏi hệ thống?")) {
+        sessionStorage.removeItem('currentUser');
+        window.location.href = "login.html";
+    }
 }

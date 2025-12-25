@@ -289,45 +289,59 @@ body{
 </head>
 
 <body>
+<div style="background: #333; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;">
+    <span id="welcomeMsg">Đang tải...</span> 
+    <div>
+        <button onclick="logout()" style="background: #c0392b; border: none; padding: 8px 15px; color: white; border-radius: 5px; cursor: pointer;">
+            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+        </button>
+    </div>
+</div>
 
+<script>
+    // KIỂM TRA ĐĂNG NHẬP & PHÂN QUYỀN
+    let currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+
+    if (!currentUser) {
+        // Chưa đăng nhập mà cố vào -> Đá về login
+        alert("Vui lòng đăng nhập!");
+        window.location.href = "login.html";
+    } else {
+        // Hiển thị tên
+        document.getElementById("welcomeMsg").innerHTML = 
+            `Xin chào, <strong>${currentUser.name}</strong> (${currentUser.role === 'admin' ? 'Chủ quán' : 'Nhân viên'})`;
+
+        // Nếu là Admin -> Hiện nút Quản lý
+        if (currentUser.role === 'admin') {
+            document.getElementById("btnMenu").style.display = "inline-block";
+            document.getElementById("btnStaff").style.display = "inline-block";
+        }
+    }
+
+    function logout() {
+        if(confirm("Bạn muốn đăng xuất?")) {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = "login.html";
+        }
+    }
+</script>
 <div class="pos-container">
 
     <div class="sidebar">
         <h2><i class="fa-solid fa-mug-hot"></i> CAFREE</h2>
         
-        <button onclick="go('Ghi chú.html')">
-            <i class="fa-solid fa-user-tag"></i> Thông tin nhân viên
+    <button id="btnNhanVien" onclick="go('thong-tin-nhan-vien.html')">
+    <i class="fa-solid fa-user-tag"></i> Thông tin nhân viên
+    </button>
+
+        <button id="btnSuaMenu" onclick="go('sua-menu.html')">
+            <i class="fa-solid fa-pen-to-square"></i> Sửa Menu
         </button>
 
-        <button onclick="go('Ghi chú.html')">
-            <i class="fa-solid fa-circle-plus"></i> Thêm món mới
-        </button>
-
-        <button onclick="go('Ghi chú.html')">
-            <i class="fa-solid fa-trash"></i> Xoá món
-        </button>
-
-        <button onclick="go('Ghi chú.html')">
-            <i class="fa-solid fa-pen-to-square"></i> Sửa món
-        </button>
-
-        <button onclick="go('Ghi chú.html')">
-            <i class="fa-solid fa-floppy-disk"></i> Lưu món
-        </button>
-
-        <button onclick="go('Ghi chú.html')">
-            <i class="fa-solid fa-list"></i> Xem danh sách món
-        </button>
-
-        <div style="flex:1"></div>
-
-        <button onclick="go('thong-ke.html')">
+        <button id="btnThongKe" onclick="go('thong-ke.html')">
             <i class="fa-solid fa-chart-line"></i> Thống kê
         </button>
 
-        <button onclick="go('giao diện đăng nhập.html')" style="background: rgba(231, 76, 60, 0.8); margin-top: 10px;">
-            <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
-        </button>
     </div>
 
     <div class="menu-area">
@@ -342,163 +356,10 @@ body{
                 <button onclick="selectTable(this, 'Mang về')" style="background: #e67e22; color: white;">Mang về</button>
             </div>
         </div>
-
-        <div class="menu-grid">
-            <div class="card" onclick="addItem('Trà sữa xoài', 35000)">
-    <img src="images/tra-sua-xoai.jpg" alt="Trà sữa xoài" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Trà sữa xoài</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-
-<div class="card" onclick="addItem('Trà sữa matcha', 35000)">
-    <img src="images/tra-sua-matcha.jpg" alt="Trà sữa matcha" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Trà sữa matcha</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-
-<div class="card" onclick="addItem('Sữa tươi đường nâu', 35000)">
-    <img src="images/sua-tuoi-duong-nau.jpg" alt="Sữa tươi đường nâu" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Sữa tươi đường nâu</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-
-<div class="card" onclick="addItem('Trà sữa đào', 35000)">
-    <img src="images/tra-sua-dao.jpg" alt="Trà sữa đào" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Trà sữa đào</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-
-<div class="card" onclick="addItem('Trà sữa thạch', 35000)">
-    <img src="images/tra-sua-thach.jpg" alt="Trà sữa thạch" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Trà sữa thạch</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-
-<div class="card" onclick="addItem('Tào phớ trà xanh', 35000)">
-    <img src="images/tao-pho-tra-xanh.jpg" alt="Tào phớ trà xanh" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Tào phớ trà xanh</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-
-<div class="card" onclick="addItem('Trà sữa kem cheese', 35000)">
-    <img src="images/tra-sua-kem-cheese.jpg" alt="Trà sữa kem cheese" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Trà sữa kem cheese</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-
-<div class="card" onclick="addItem('Trà xanh', 35000)">
-    <img src="images/tra-xanh.jpg" alt="Trà xanh" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Trà xanh</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-
-<div class="card" onclick="addItem('Smoothie dâu', 35000)">
-    <img src="images/smoothie-dau.jpg" alt="Smoothie dâu" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Smoothie dâu</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-
-<div class="card" onclick="addItem('Trà sữa đậu đỏ', 35000)">
-    <img src="images/tra-sua-dau-do.jpg" alt="Trà sữa đậu đỏ" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Trà sữa đậu đỏ</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-
-<div class="card" onclick="addItem('Trà ô long', 35000)">
-    <img src="images/tra-o-long.jpg" alt="Trà ô long" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Trà ô long</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-
-<div class="card" onclick="addItem('Trà sữa oreo', 35000)">
-    <img src="images/tra-sua-oreo.jpg" alt="Trà sữa oreo" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Trà sữa oreo</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-
-<div class="card" onclick="addItem('Trà hoa nhài', 35000)">
-    <img src="images/tra-hoa-nhai.jpg" alt="Trà hoa nhài" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
-    <div class="card-body">
-        <b>Trà hoa nhài</b>
-        <div class="price">35.000 đ</div>
-    </div>
-</div>
-            <div class="card" onclick="addItem('Cà phê đen',25000)">
-                <img src="images/cafe-den.jpg" alt="Cà phê đen">
-                <div class="card-body"><b>Cà phê đen</b><div class="price">25.000 đ</div></div>
-            </div>
-            <div class="card" onclick="addItem('Cà phê sữa',28000)">
-                <img src="images/cafe-sua.jpg" alt="Cà phê sữa">
-                <div class="card-body"><b>Cà phê sữa</b><div class="price">28.000 đ</div></div>
-            </div>
-            <div class="card" onclick="addItem('Bạc xỉu',30000)">
-                <img src="images/bac-xiu.jpg" alt="Bạc xỉu">
-                <div class="card-body"><b>Bạc xỉu</b><div class="price">30.000 đ</div></div>
-            </div>
-            <div class="card" onclick="addItem('Latte',35000)">
-                <img src="images/latte.jpg" alt="Latte">
-                <div class="card-body"><b>Latte</b><div class="price">35.000 đ</div></div>
-            </div>
-            <div class="card" onclick="addItem('Cappuccino',38000)">
-                <img src="images/cappuccino.jpg" alt="Cappuccino">
-                <div class="card-body"><b>Cappuccino</b><div class="price">38.000 đ</div></div>
-            </div>
-            <div class="card" onclick="addItem('Trà đào',35000)">
-                <img src="images/tra-dao.jpg" alt="Trà đào">
-                <div class="card-body"><b>Trà đào</b><div class="price">35.000 đ</div></div>
-            </div>
-            <div class="card" onclick="addItem('Trà chanh',30000)">
-                <img src="images/tra-chanh.jpg" alt="Trà chanh">
-                <div class="card-body"><b>Trà chanh</b><div class="price">30.000 đ</div></div>
-            </div>
-            <div class="card" onclick="addItem('Trà sữa',40000)">
-                <img src="images/tra-sua.jpg" alt="Trà sữa">
-                <div class="card-body"><b>Trà sữa</b><div class="price">40.000 đ</div></div>
-            </div>
-            <div class="card" onclick="addItem('Trà sữa trân châu',45000)">
-                <img src="images/tra-sua-tran-chau.jpg" alt="Trà sữa trân châu">
-                <div class="card-body"><b>Trà sữa trân châu</b><div class="price">45.000 đ</div></div>
-            </div>
-            <div class="card" onclick="addItem('Sinh tố xoài',45000)">
-                <img src="images/sinh-to-xoai.jpg" alt="Sinh tố xoài">
-                <div class="card-body"><b>Sinh tố xoài</b><div class="price">45.000 đ</div></div>
-            </div>
-            <div class="card" onclick="addItem('Smoothie dâu',45000)">
-                <img src="images/smoothie-dau.jpg" alt="Smoothie dâu">
-                <div class="card-body"><b>Sinh tố dâu</b><div class="price">45.000 đ</div></div>
-            </div>
-            <div class="card" onclick="addItem('Nước cam',35000)">
-                <img src="images/nuoc-ep-cam.jpg" alt="Nước ép cam">
-                <div class="card-body"><b>Nước cam</b><div class="price">35.000 đ</div></div>
-            </div>
-        </div>
-    </div>
-
-    <div class="order-area">
+        
+        <div class="menu-grid"></div> 
+        
+    </div> <div class="order-area">
         <div class="order-header">
             <h3 id="currentTableName">Chọn bàn để gọi món</h3>
             <small id="orderTime">--:--</small>
@@ -507,9 +368,11 @@ body{
         <div id="orderList" class="order-list">
             <p style="text-align:center; color:#888; margin-top:50px;">Chưa có món nào</p>
         </div>
+        
         <div class="order-note">
-        <textarea id="noteInput" placeholder="Ghi chú (VD: Ít đá, không đường...)"></textarea>
+            <textarea id="noteInput" placeholder="Ghi chú (VD: Ít đá, không đường...)"></textarea>
         </div>
+        
         <div class="total-section">
             <div class="total-row">
                 <span>Tổng tiền:</span>
@@ -520,216 +383,8 @@ body{
     </div>
 
 </div>
+<script src="scripts.js"></script>
 
-<script>
-// ============================================
-// LOGIC POS 
-// ============================================
-
-let tableOrders = {}; 
-let currentTableId = null;
-
-// Hàm chọn bàn
-function selectTable(btn, tableId){
-    document.querySelectorAll(".table-bar button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-
-    currentTableId = tableId;
-    document.getElementById("currentTableName").innerText = "Hóa đơn: " + tableId;
-
-    if (!tableOrders[tableId]) {
-        tableOrders[tableId] = {};
-    }
-
-    renderOrder();
-}
-
-// Hàm thêm món
-function addItem(name, price){
-    if(!currentTableId){
-        alert("Vui lòng chọn bàn trước khi gọi món!");
-        return;
-    }
-
-    let cart = tableOrders[currentTableId];
-    if(!cart[name]) {
-        cart[name] = { price: price, qty: 1 };
-    } else {
-        cart[name].qty++;
-    }
-    renderOrder();
-    updateTableStatus();
-}
-
-// Hàm hiển thị danh sách món (Render)
-function renderOrder(){
-    if (!currentTableId) return;
-
-    let cart = tableOrders[currentTableId];
-    let container = document.getElementById("orderList");
-    let html = "";
-    let total = 0;
-
-    if (Object.keys(cart).length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#888; margin-top:50px;">Chưa có món nào</p>';
-        document.getElementById("totalMoney").innerText = "0 đ";
-        return;
-    }
-
-    for (let name in cart) {
-        let item = cart[name];
-        let itemTotal = item.qty * item.price;
-        total += itemTotal;
-
-        html += `
-        <div class="order-item">
-            <div>
-                <div style="font-weight:bold; font-size:15px;">${name}</div>
-                <div class="qty-control">
-                    <button class="qty-btn" onclick="updateQty('${name}', -1)">-</button>
-                    <span>${item.qty}</span>
-                    <button class="qty-btn" onclick="updateQty('${name}', 1)">+</button>
-                    <div style="font-size:12px; color:#666; margin-left:5px;">x ${item.price.toLocaleString()}</div>
-                </div>
-            </div>
-            <div>
-                <div style="font-weight:bold;">${itemTotal.toLocaleString()} đ</div>
-                <div style="text-align:right;"><i class="fa-solid fa-trash remove-btn" onclick="removeItem('${name}')"></i></div>
-            </div>
-        </div>
-        `;
-    }
-
-    container.innerHTML = html;
-    document.getElementById("totalMoney").innerText = total.toLocaleString() + " đ";
-}
-
-function updateQty(name, delta) {
-    let cart = tableOrders[currentTableId];
-    if(cart[name]) {
-        cart[name].qty += delta;
-        if (cart[name].qty <= 0) delete cart[name];
-    }
-    renderOrder();
-    updateTableStatus();
-}
-
-function removeItem(name) {
-    if (confirm("Xóa món " + name + "?")) {
-        let cart = tableOrders[currentTableId];
-        delete cart[name];
-        renderOrder();
-        updateTableStatus();
-    }
-}
-
-// ============================================
-// LOGIC THANH TOÁN MỚI (MODAL)
-// ============================================
-
-// 1. Hàm mở Popup khi ấn nút THANH TOÁN ở ngoài
-function pay() {
-    if (!currentTableId) { alert("Chưa chọn bàn!"); return; }
-    
-    let cart = tableOrders[currentTableId];
-    if (Object.keys(cart).length === 0) {
-        alert("Bàn này chưa có món nào!");
-        return;
-    }
-
-    // Tính tổng tiền
-    let total = 0;
-    for(let k in cart) total += cart[k].qty * cart[k].price;
-
-    // Hiển thị thông tin lên Modal
-    document.getElementById("modalTableName").innerText = currentTableId;
-    document.getElementById("modalTotalMoney").innerText = total.toLocaleString() + " đ";
-    document.getElementById("modalTotalMoney").dataset.value = total; // Lưu giá trị số để tính toán
-    
-    // Reset form tiền mặt
-    document.getElementById("customerPay").value = "";
-    document.getElementById("changeText").innerText = "Tiền thừa: 0 đ";
-    
-    // Mở Modal
-    document.getElementById("paymentModal").style.display = "flex";
-}
-
-// 2. Hàm đóng Popup
-function closeModal() {
-    document.getElementById("paymentModal").style.display = "none";
-}
-
-// 3. Hàm chuyển đổi giữa Tiền mặt và QR
-function switchMethod(method) {
-    // Ẩn hết các section
-    document.querySelectorAll('.pay-section').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.pay-btn').forEach(el => el.classList.remove('active'));
-
-    // Hiện section được chọn
-    if (method === 'cash') {
-        document.getElementById('section-cash').classList.add('active');
-        document.querySelectorAll('.pay-btn')[0].classList.add('active');
-    } else {
-        document.getElementById('section-qr').classList.add('active');
-        document.querySelectorAll('.pay-btn')[1].classList.add('active');
-    }
-}
-
-// 4. Hàm tính tiền thừa (khi nhập tiền khách đưa)
-function calcChange() {
-    let total = parseFloat(document.getElementById("modalTotalMoney").dataset.value);
-    let customerPay = parseFloat(document.getElementById("customerPay").value) || 0;
-    let change = customerPay - total;
-
-    if (change >= 0) {
-        document.getElementById("changeText").innerText = "Tiền thừa: " + change.toLocaleString() + " đ";
-        document.getElementById("changeText").style.color = "#27ae60"; // Màu xanh
-    } else {
-        document.getElementById("changeText").innerText = "Thiếu: " + Math.abs(change).toLocaleString() + " đ";
-        document.getElementById("changeText").style.color = "#e74c3c"; // Màu đỏ
-    }
-}
-
-// 5. Hàm Xác nhận thanh toán cuối cùng
-function confirmPayment(type) {
-    let total = parseFloat(document.getElementById("modalTotalMoney").dataset.value);
-    
-    if (type === 'cash') {
-        let customerPay = parseFloat(document.getElementById("customerPay").value) || 0;
-        let change = customerPay - total;
-        
-        // Logic: Nếu khách đưa đủ hoặc thừa -> OK. Nếu thiếu mà vẫn ấn -> Vẫn cho qua (theo yêu cầu của bạn)
-        if (change >= 0) {
-            alert(`Thanh toán THÀNH CÔNG!\nTrả lại khách: ${change.toLocaleString()} đ`);
-        } else {
-            // Trường hợp khách đưa thiếu nhưng vẫn bấm thanh toán
-             alert("Thanh toán thành công!");
-        }
-    } else {
-        // Trường hợp chuyển khoản
-        alert("Xác nhận đã nhận được tiền chuyển khoản!\nThanh toán thành công.");
-    }
-
-    // Xóa dữ liệu bàn và đóng modal
-    tableOrders[currentTableId] = {};
-    renderOrder();
-    updateTableStatus();
-    closeModal();
-}
-
-function updateTableStatus() {
-    let buttons = document.querySelectorAll(".table-bar button");
-    let tableIdMap = {"Bàn 1": "B1", "Bàn 2": "B2", "Bàn 3": "B3", "Bàn 4": "B4", "Bàn 5": "B5"};
-    buttons.forEach(btn => {
-        let tId = tableIdMap[btn.innerText];
-        if (tableOrders[tId] && Object.keys(tableOrders[tId]).length > 0) {
-            btn.classList.add("has-order");
-        } else {
-            btn.classList.remove("has-order");
-        }
-    });
-}
-</script>
 <div id="paymentModal" class="modal">
     <div class="modal-content">
         <h3>Thanh toán: <span id="modalTableName"></span></h3>
