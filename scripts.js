@@ -334,7 +334,7 @@ function checkUserPermission() {
     }
 
     // 4. Hiển thị tên và vai trò
-    const roleName = currentUser.role === 'admin' ? 'Chủ quán' : 'Nhân viên';
+    const roleName = currentUser.role === 'admin' ? 'Bạch Nga' : 'Nhân viên';
     const welcomeMsg = document.getElementById("welcomeMsg");
     if (welcomeMsg) {
         welcomeMsg.innerHTML = `Xin chào, <strong>${currentUser.name}</strong> (${roleName})`;
@@ -360,4 +360,30 @@ function logout() {
         sessionStorage.removeItem('currentUser');
         window.location.href = "login.html";
     }
+}
+// --- TÍNH NĂNG TÌM KIẾM MÓN ĂN ---
+function searchMenu() {
+    // 1. Lấy từ khóa người dùng gõ vào, đổi thành chữ thường
+    let keyword = document.getElementById("searchInput").value.toLowerCase();
+    
+    // 2. Lấy tất cả các thẻ món ăn (class .card)
+    let items = document.querySelectorAll(".card");
+    
+    // 3. Duyệt qua từng món để kiểm tra
+    items.forEach(item => {
+        // Tìm thẻ <b> chứa tên món trong card đó
+        let nameElement = item.querySelector("b"); 
+        
+        if (nameElement) {
+            let name = nameElement.innerText.toLowerCase();
+            
+            // Nếu tên món có chứa từ khóa -> Hiện
+            if (name.includes(keyword)) {
+                item.style.display = "block";
+            } else {
+                // Không chứa -> Ẩn
+                item.style.display = "none";
+            }
+        }
+    });
 }

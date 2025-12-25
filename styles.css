@@ -110,3 +110,42 @@ body {
     border-color: #2196F3;  /* Đổi màu viền khi bấm vào nhập */
     background-color: #fff;
 }
+/* --- CSS CHO THANH TÌM KIẾM --- */
+
+/* Gom nhóm Tiêu đề và Ô tìm kiếm sang bên trái */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Khoảng cách giữa chữ MENU và ô tìm kiếm */
+}
+
+.search-box {
+    position: relative; /* Để icon nằm đè lên input */
+}
+
+.search-box input {
+    padding: 8px 15px 8px 35px; /* Chừa chỗ bên trái cho cái icon kính lúp */
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    outline: none;
+    width: 220px;
+    font-size: 14px;
+    transition: 0.3s;
+    background: #f9f9f9;
+}
+
+.search-box input:focus {
+    border-color: #6a11cb;
+    background: white;
+    box-shadow: 0 0 8px rgba(106, 17, 203, 0.15);
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 14px;
+    pointer-events: none;
+}

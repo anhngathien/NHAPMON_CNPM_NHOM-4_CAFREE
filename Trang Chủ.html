@@ -17,10 +17,10 @@ body{
     background:#f3f4f6;
     overflow: hidden; 
 }
-.pos-container{
-    display:grid;
-    grid-template-columns:240px 1fr 360px;
-    height:100vh;
+.pos-container {
+    display: grid;
+    grid-template-columns: 240px 1fr 360px;
+    height: calc(100vh - 60px); /* SỬA DÒNG NÀY: Trừ đi 60px */
 }
 
 /* 1. SIDEBAR */
@@ -85,32 +85,57 @@ body{
     letter-spacing: 1px;
 }
 
-/* Table Bar */
-.table-bar{ display:flex; gap:10px; flex-wrap: wrap;}
-.table-bar button{
-    padding:10px 16px;
-    border:none;
-    border-radius:16px;
-    background:#e5e7eb;
-    font-weight:bold;
-    cursor:pointer;
+/* --- SỬA LẠI CSS CHO TABLE BAR --- */
+.table-bar {
+    display: grid;              /* Dùng Grid cho đều */
+    grid-template-columns: repeat(4, 1fr); /* Chia làm 4 cột bằng nhau */
+    gap: 8px;                   /* Khoảng cách giữa các nút */
+    width: 100%;                /* Chiếm hết khoảng trống bên phải */
+    max-width: 450px;           /* Giới hạn chiều rộng để không bị giãn quá */
+}
+
+.table-bar button {
+    padding: 8px 5px;           /* Thu gọn padding để nút nhỏ gọn */
+    border: none;
+    border-radius: 8px;         /* Bo góc nhẹ hơn cho gọn */
+    background: #e5e7eb;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 13px;            /* Chữ vừa phải */
     transition: 0.2s;
+    width: 100%;                /* Nút tự giãn full ô */
+    white-space: nowrap;        /* Không cho chữ xuống dòng */
 }
+
+/* Hiệu ứng khi di chuột và khi chọn */
 .table-bar button:hover { background: #d1d5db; }
-.table-bar button.active{
-    background:#6a11cb;
-    color:white;
-    box-shadow: 0 4px 10px rgba(106, 17, 203, 0.4);
+.table-bar button.active {
+    background: #6a11cb;
+    color: white;
+    box-shadow: 0 2px 5px rgba(106, 17, 203, 0.3);
 }
+
+/* Riêng nút Mang về cho màu cam nổi bật */
+.table-bar button.btn-takeaway {
+    background: #e67e22; 
+    color: white;
+}
+.table-bar button.btn-takeaway.active {
+    background: #d35400; /* Màu cam đậm hơn khi chọn */
+    border: 2px solid white;
+}
+
+/* Nút nào có khách (đang order) thì viền xanh */
 .table-bar button.has-order {
     border: 2px solid #27ae60;
     color: #27ae60;
+    background: #fff;
 }
 .table-bar button.active.has-order {
-    border: 2px solid white;
-    color: white;
+    border: 2px solid #fff;
+    color: #fff;
+    background: #27ae60;
 }
-
 /* Grid Món Ăn */
 .menu-grid{
     display:grid;
@@ -132,15 +157,30 @@ body{
 .price{color:#6a11cb;font-weight:bold; margin-top: 5px;}
 
 /* 3. ORDER AREA */
-.order-area{
-    background:white;
-    padding:20px;
-    display:flex;
-    flex-direction:column;
+.order-area {
+    background: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
     border-left: 1px solid #ddd;
+
+    /* 👇 QUAN TRỌNG: THÊM 2 DÒNG NÀY VÀO ĐỂ GIỚI HẠN CHIỀU CAO 👇 */
+    height: 100%;       /* Bắt buộc chiều cao phải bằng khung cha, không được dài hơn */
+    overflow: hidden;   /* Cắt bỏ phần thừa để con lăn bên trong hoạt động */
 }
 .order-header { text-align: center; border-bottom: 2px dashed #eee; padding-bottom: 15px;}
-.order-list{flex:1;overflow-y:auto; padding-top: 10px;}
+.order-list {
+    flex: 1; 
+    overflow-y: auto;   /* Con lăn sẽ hiện ở đây */
+    padding-right: 5px; /* Để con lăn không đè lên chữ */
+}
+.order-list::-webkit-scrollbar {
+    width: 6px;
+}
+.order-list::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}
 .order-item{
     display:flex;
     justify-content:space-between;
@@ -164,9 +204,10 @@ body{
 .qty-btn:hover { background: #ddd; }
 .remove-btn{color:#e74c3c;cursor:pointer; margin-left: 8px;}
 
-.total-section{
+.total-section {
     border-top: 2px solid #333;
     padding-top: 15px;
+    background: white;
 }
 .total-row { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-bottom: 15px;}
 .btn-pay{
@@ -309,7 +350,7 @@ body{
     } else {
         // Hiển thị tên
         document.getElementById("welcomeMsg").innerHTML = 
-            `Xin chào, <strong>${currentUser.name}</strong> (${currentUser.role === 'admin' ? 'Chủ quán' : 'Nhân viên'})`;
+            `Xin chào, <strong>${currentUser.name}</strong> (${currentUser.role === 'admin' ? 'Bạch Nga' : 'Nhân viên'})`;
 
         // Nếu là Admin -> Hiện nút Quản lý
         if (currentUser.role === 'admin') {
@@ -346,20 +387,30 @@ body{
 
     <div class="menu-area">
         <div class="menu-header">
-            <h3>Menu</h3>
-            <div class="table-bar" id="tableBar">
-                <button onclick="selectTable(this, 'B1')">Bàn 1</button>
-                <button onclick="selectTable(this, 'B2')">Bàn 2</button>
-                <button onclick="selectTable(this, 'B3')">Bàn 3</button>
-                <button onclick="selectTable(this, 'B4')">Bàn 4</button>
-                <button onclick="selectTable(this, 'B5')">Bàn 5</button>
-                <button onclick="selectTable(this, 'Mang về')" style="background: #e67e22; color: white;">Mang về</button>
-            </div>
+    <div class="header-left">
+        <h3>Menu</h3>
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Tìm nhanh món..." onkeyup="searchMenu()">
         </div>
+    </div>
+
+    <div class="table-bar" id="tableBar">
+<button onclick="selectTable(this, 'B1')">Bàn 1</button>
+    <button onclick="selectTable(this, 'B2')">Bàn 2</button>
+    <button onclick="selectTable(this, 'B3')">Bàn 3</button>
+    <button onclick="selectTable(this, 'B4')">Bàn 4</button>
+    <button onclick="selectTable(this, 'B5')">Bàn 5</button>
+    <button onclick="selectTable(this, 'B6')">Bàn 6</button> 
+    <button onclick="selectTable(this, 'B7')">Bàn 7</button> 
+    <button onclick="selectTable(this, 'Mang về')" style="background: #e67e22; color: white;">Mang về</button>
+    </div>
+</div>
         
         <div class="menu-grid"></div> 
         
-    </div> <div class="order-area">
+    </div> 
+    <div class="order-area">
         <div class="order-header">
             <h3 id="currentTableName">Chọn bàn để gọi món</h3>
             <small id="orderTime">--:--</small>
