@@ -93,7 +93,9 @@
                 <i class="fa-solid fa-user-gear"></i> QUẢN LÝ NHÂN SỰ (Dành cho Chủ quán)
             </h3>
             <div class="table-container">
-                <button onclick="alert('Tính năng thêm nhân viên mới đang phát triển!')" style="background:#27ae60; color:white; border:none; padding:8px 15px; border-radius:4px; margin-bottom:10px; cursor:pointer;">+ Thêm nhân viên mới</button>
+                <button onclick="openAddModal()" style="background:#27ae60; color:white; border:none; padding:8px 15px; border-radius:4px; margin-bottom:10px; cursor:pointer;">
+    <i class="fa-solid fa-plus"></i> Thêm nhân viên mới
+</button>
                 <table>
                     <thead>
                         <tr>
@@ -111,25 +113,46 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="editModal">
+<div class="modal-overlay" id="addModal">
         <div class="modal-box">
-            <h3>Sửa thông tin nhân viên</h3>
-            <input type="hidden" id="editIndex">
+            <h3 style="color:#27ae60; border-bottom: 2px solid #eee; padding-bottom:10px; margin-top:0;">
+                <i class="fa-solid fa-user-plus"></i> Thêm nhân viên mới
+            </h3>
+            
             <div class="form-group">
-                <label>Họ tên:</label>
-                <input type="text" id="editName">
+                <label>Tài khoản đăng nhập (*):</label>
+                <input type="text" id="addUsername" placeholder="Ví dụ: nv4, nv5...">
+                <small style="color:red; display:none; margin-top:5px;" id="userError">Tài khoản này đã tồn tại!</small>
             </div>
+
+            <div class="form-group">
+                <label>Mật khẩu:</label>
+                <input type="text" id="addPassword" value="1" placeholder="Mặc định là 1">
+            </div>
+
+            <div class="form-group">
+                <label>Họ và tên:</label>
+                <input type="text" id="addName" placeholder="Ví dụ: Nguyễn Văn D">
+            </div>
+
             <div class="form-group">
                 <label>Ca làm việc:</label>
-                <input type="text" id="editShift">
+                <select id="addShift" style="width:100%; padding:8px; border:1px solid #ddd; border-radius:4px;">
+                    <option value="Sáng (6h - 14h)">Sáng (6h - 14h)</option>
+                    <option value="Chiều (14h - 22h)">Chiều (14h - 22h)</option>
+                    <option value="Tối (18h - 23h)">Tối (18h - 23h)</option>
+                    <option value="Part-time">Part-time linh hoạt</option>
+                </select>
             </div>
+            
             <div class="form-group">
-                <label>Số điện thoại:</label>
-                <input type="text" id="editPhone">
+                <label>Lương cơ bản (VNĐ/h):</label>
+                <input type="number" id="addSalary" value="20000">
             </div>
+
             <div class="modal-actions">
-                <button onclick="closeEditModal()" style="padding:8px 15px; cursor:pointer;">Hủy</button>
-                <button onclick="saveEdit()" style="background:#6a11cb; color:white; border:none; padding:8px 15px; cursor:pointer; margin-left:10px;">Lưu lại</button>
+                <button onclick="closeAddModal()" style="padding:8px 15px; cursor:pointer; background:#eee; border:none; border-radius:4px;">Hủy bỏ</button>
+                <button onclick="saveNewUser()" style="background:#27ae60; color:white; border:none; padding:8px 15px; cursor:pointer; margin-left:10px; border-radius:4px; font-weight:bold;">Thêm ngay</button>
             </div>
         </div>
     </div>
@@ -273,6 +296,72 @@
             renderStaffTable();
             closeEditModal();
         }
+function openAddModal() {
+        // Reset form cho sạch sẽ trước khi nhập
+        document.getElementById("addUsername").value = "";
+        document.getElementById("addName").value = "";
+        document.getElementById("addPassword").value = "1"; // Mặc định pass là 1
+        document.getElementById("addSalary").value = "20000";
+        document.getElementById("userError").style.display = "none";
+        
+        // Hiện Modal lên
+        document.getElementById("addModal").style.display = "flex";
+    }
+
+    // 2. Hàm đóng Modal
+    function closeAddModal() {
+        document.getElementById("addModal").style.display = "none";
+    }
+
+    // 3. Hàm Lưu nhân viên mới
+    function saveNewUser() {
+        // A. Lấy dữ liệu từ ô nhập
+        let uUser = document.getElementById("addUsername").value.trim();
+        let uPass = document.getElementById("addPassword").value.trim();
+        let uName = document.getElementById("addName").value.trim();
+        let uShift = document.getElementById("addShift").value;
+        let uSalary = parseInt(document.getElementById("addSalary").value);
+
+        // B. Kiểm tra dữ liệu (Validate)
+        if (!uUser || !uName) {
+            alert("Vui lòng nhập đủ Tài khoản và Họ tên!");
+            return;
+        }
+
+        // C. Kiểm tra xem tài khoản đã trùng chưa
+        // (Lấy danh sách user hiện tại để so sánh)
+        let currentUsers = JSON.parse(localStorage.getItem('cafeUsers')) || [];
+        let isExist = currentUsers.some(u => u.username === uUser);
+        
+        if (isExist) {
+            document.getElementById("userError").style.display = "block";
+            alert("Tài khoản '" + uUser + "' đã tồn tại! Vui lòng chọn tên khác.");
+            return;
+        }
+
+        // D. Tạo đối tượng nhân viên mới
+        let newUser = {
+            username: uUser,
+            password: uPass || "1", // Nếu quên nhập pass thì mặc định là 1
+            role: "staff",          // Chắc chắn là nhân viên
+            name: uName,
+            shift: uShift,
+            salary: uSalary || 20000,
+            phone: ""               // Để trống, cập nhật sau
+        };
+
+        // E. Lưu vào danh sách chung
+        currentUsers.push(newUser);
+        localStorage.setItem('cafeUsers', JSON.stringify(currentUsers));
+
+        // F. Cập nhật giao diện ngay lập tức
+        // (Cập nhật biến toàn cục users để hàm renderStaffTable vẽ đúng)
+        users = currentUsers; 
+        renderStaffTable();
+        closeAddModal();
+        
+        alert("✅ Đã thêm nhân viên: " + uName);
+    }
     </script>
 </body>
 </html>

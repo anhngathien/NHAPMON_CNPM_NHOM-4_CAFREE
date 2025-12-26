@@ -458,13 +458,19 @@ body{
         <div id="section-cash" class="pay-section active">
             <input type="number" id="customerPay" class="money-input" placeholder="Nhập tiền khách đưa..." oninput="calcChange()">
             <div class="change-info" id="changeText">Tiền thừa: 0 đ</div>
-            <button class="btn-pay" onclick="confirmPayment('cash')">XÁC NHẬN THANH TOÁN</button>
+            
+            <button class="btn-pay" onclick="confirmPayment('cash')" style="background: #00ff2298;">
+                <i class="fa-solid fa-print"></i> IN HÓA ĐƠN & HOÀN TẤT
+            </button>
         </div>
 
         <div id="section-qr" class="pay-section">
             <p>Quét mã QR để thanh toán</p>
             <img src="images/qr.jpg" class="qr-img" alt="QR Code" width="180" height="180">
-            <button class="btn-pay" onclick="confirmPayment('qr')">ĐÃ CHUYỂN KHOẢN XONG</button>
+            
+            <button class="btn-pay" onclick="confirmPayment('qr')" style="background: #00ff2298;">
+                <i class="fa-solid fa-print"></i> IN HÓA ĐƠN & HOÀN TẤT
+            </button>
         </div>
 
         <button class="close-modal" onclick="closeModal()">Đóng lại</button>
