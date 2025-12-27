@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Danh sách nhân viên</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    padding: 20px;
+  }
+
+  h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+  }
+
+  th {
+    background-color: #1e88e5;
+    color: white;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .role-manager {
+    color: #e53935;
+    font-weight: bold;
+  }
+
+  .role-service {
+    color: #43a047;
+    font-weight: bold;
+  }
+
+  .role-order {
+    color: #fb8c00;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<h2>DANH SÁCH NHÂN VIÊN</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>STT</th>
+      <th>Mã nhân viên</th>
+      <th>Tên nhân viên</th>
+      <th>Tài khoản</th>
+      <th>Mật khẩu</th>
+      <th>Chức vụ</th>
+    </tr>
+  </thead>
+  <tbody id="employeeTable"></tbody>
+</table>
+
+<script>
+const employees = [
+  {
+    id: "NV001",
+    name: "Nguyễn Văn A",
+    username: "nva",
+    password: "123456",
+    role: "Quản lý"
+  },
+  {
+    id: "NV002",
+    name: "Trần Thị B",
+    username: "ttb",
+    password: "123456",
+    role: "Phục vụ"
+  },
+  {
+    id: "NV003",
+    name: "Lê Văn C",
+    username: "lvc",
+    password: "123456",
+    role: "Order"
+  }
+];
+
+const table = document.getElementById("employeeTable");
+
+employees.forEach((emp, index) => {
+  let roleClass = "";
+  if (emp.role === "Quản lý") roleClass = "role-manager";
+  if (emp.role === "Phục vụ") roleClass = "role-service";
+  if (emp.role === "Order") roleClass = "role-order";
+
+  table.innerHTML += `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${emp.id}</td>
+      <td>${emp.name}</td>
+      <td>${emp.username}</td>
+      <td>${emp.password}</td>
+      <td class="${roleClass}">${emp.role}</td>
+    </tr>
+  `;
+});
+</script>
+
+</body>
+</html>
